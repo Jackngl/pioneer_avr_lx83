@@ -1,8 +1,8 @@
 # Pioneer AVR LX83 Integration for Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
-[![GitHub release](https://img.shields.io/github/release/jack/pioneer_avr_lx83.svg)](https://GitHub.com/jack/pioneer_avr_lx83/releases/)
-[![License](https://img.shields.io/github/license/jack/pioneer_avr_lx83.svg)](LICENSE)
+[![GitHub release](https://img.shields.io/github/release/Jackngl/pioneer_avr_lx83.svg)](https://GitHub.com/Jackngl/pioneer_avr_lx83/releases/)
+[![License](https://img.shields.io/github/license/Jackngl/pioneer_avr_lx83.svg)](LICENSE)
 
 Custom Home Assistant integration for Pioneer AVR LX83 receivers using Telnet protocol.
 
@@ -24,7 +24,7 @@ Custom Home Assistant integration for Pioneer AVR LX83 receivers using Telnet pr
 2. Click on "Integrations"
 3. Click the three dots in the top right corner
 4. Select "Custom repositories"
-5. Add `https://github.com/jack/pioneer_avr_lx83` as repository
+5. Add `https://github.com/Jackngl/pioneer_avr_lx83` as repository
 6. Select "Integration" as category
 7. Click "Add"
 8. Search for "Pioneer AVR LX83" and install
@@ -100,5 +100,5 @@ Developed by Jack
 
 ## Support
 
-If you encounter any issues, please [open an issue](https://github.com/jack/pioneer_avr_lx83/issues) on GitHub.
+If you encounter any issues, please [open an issue](https://github.com/Jackngl/pioneer_avr_lx83/issues) on GitHub.
 
