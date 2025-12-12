@@ -53,6 +53,7 @@ class PioneerAVR(MediaPlayerEntity):
 
     _attr_has_entity_name = True
     _attr_name = None
+    _attr_icon = "mdi:amplifier"
 
     def __init__(
         self,

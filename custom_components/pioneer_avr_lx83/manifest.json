@@ -1,6 +1,6 @@
 {
   "domain": "pioneer_avr_lx83",
-  "name": "Pioneer AVR LX83",
+  "name": "Pioneer AVR",
   "codeowners": ["@Jackngl"],
   "config_flow": true,
   "documentation": "https://github.com/Jackngl/pioneer_avr_lx83",

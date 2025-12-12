@@ -2,8 +2,8 @@
   "config": {
     "step": {
       "user": {
-        "title": "Pioneer AVR LX83 Setup",
-        "description": "Enter the connection details for your Pioneer AVR LX83",
+        "title": "Pioneer AVR Setup",
+        "description": "Enter the connection details for your Pioneer Audio/Video Receiver",
         "data": {
           "host": "IP Address",
           "port": "Port",

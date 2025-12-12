@@ -2,8 +2,8 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configuration Pioneer AVR LX83",
-        "description": "Entrez les détails de connexion pour votre Pioneer AVR LX83",
+        "title": "Configuration Pioneer AVR",
+        "description": "Entrez les détails de connexion pour votre amplificateur Pioneer Audio/Vidéo",
         "data": {
           "host": "Adresse IP",
           "port": "Port",

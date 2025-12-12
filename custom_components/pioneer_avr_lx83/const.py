@@ -2,7 +2,7 @@
 from homeassistant.components.media_player import MediaPlayerEntityFeature
 
 DOMAIN = "pioneer_avr_lx83"
-DEFAULT_NAME = "Pioneer AVR LX83"
+DEFAULT_NAME = "Pioneer AVR"
 DEFAULT_PORT = 23
 DEFAULT_TIMEOUT = 5
 
