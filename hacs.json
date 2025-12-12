@@ -1,0 +1,8 @@
+{
+  "name": "Pioneer AVR LX83",
+  "render_readme": true,
+  "domains": ["media_player"],
+  "iot_class": "Local Polling",
+  "homeassistant": "2023.1.0"
+}
+

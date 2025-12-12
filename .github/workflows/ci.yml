@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort
+    - name: Lint with flake8
+      run: |
+        flake8 custom_components/pioneer_avr_lx83 --count --select=E9,F63,F7,F82 --show-source --statistics
+    - name: Check formatting with black
+      run: |
+        black --check custom_components/pioneer_avr_lx83
+    - name: Check import sorting with isort
+      run: |
+        isort --check-only custom_components/pioneer_avr_lx83
+
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: HACS validation
+      uses: hacs/action@main
+      with:
+        category: integration
+

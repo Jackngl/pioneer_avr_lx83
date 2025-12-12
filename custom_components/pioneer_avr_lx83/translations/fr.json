@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configuration Pioneer AVR LX83",
+        "description": "Entrez les détails de connexion pour votre Pioneer AVR LX83",
+        "data": {
+          "host": "Adresse IP",
+          "port": "Port",
+          "name": "Nom"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Échec de la connexion à l'appareil",
+      "unknown": "Erreur inattendue"
+    },
+    "abort": {
+      "already_configured": "L'appareil est déjà configuré"
+    }
+  }
+}
+
