@@ -163,7 +163,7 @@ class PioneerAVR(MediaPlayerEntity):
     async def async_set_volume_level(self, volume: float) -> None:
         """Set volume level, range 0..1."""
         volume_int = int(volume * 185)
-        await self._send_command(f"{CMD_VOLUME}{volume_int:03d}")
+        await self._send_command(f"{volume_int:03d}{CMD_VOLUME}")
         self._volume = volume
         self.async_write_ha_state()
 
