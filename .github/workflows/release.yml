@@ -1,39 +1,19 @@
-name: Release
+name: Publish Release
 
 on:
-  release:
-    types: [ published ]
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
-  update-version:
+  release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: Extract version from tag
-      id: version
-      run: |
-        VERSION=${GITHUB_REF#refs/tags/v}
-        VERSION=${VERSION#refs/tags/}
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "Version: $VERSION"
-    - name: Update manifest version
-      run: |
-        VERSION="${{ steps.version.outputs.version }}"
-        python3 scripts/update_version.py "$VERSION"
-    - name: Commit version update
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add custom_components/pioneer_avr_lx83/manifest.json
-        if git diff --staged --quiet; then
-          echo "No changes to commit"
-        else
-          git commit -m "chore: bump version to ${{ steps.version.outputs.version }}"
-          git push origin HEAD:main || echo "Push failed, but continuing"
-        fi
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: false

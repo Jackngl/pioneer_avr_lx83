@@ -41,12 +41,18 @@ Après avoir créé le dépôt, mettez à jour ces fichiers avec votre URL GitHu
 
 ## Étape 5 : Créer une release
 
-1. Allez dans "Releases" sur GitHub
-2. Cliquez sur "Create a new release"
-3. Tag: `v1.0.0`
-4. Title: `v1.0.0 - Initial Release`
-5. Description: Copiez le contenu de CHANGELOG.md
-6. Cliquez sur "Publish release"
+1. Bumper la version localement :
+   ```bash
+   ./scripts/bump_version.py 1.0.1
+   git add VERSION CHANGELOG.md custom_components/pioneer_avr_lx83/manifest.json
+   git commit -m "chore: prepare v1.0.1"
+   ```
+2. Créez et poussez le tag :
+   ```bash
+   git tag -a v1.0.1 -m "Release v1.0.1"
+   git push origin main --tags
+   ```
+3. Le workflow `.github/workflows/release.yml` publiera automatiquement la release GitHub (HACS détectera alors la version `1.0.1` au lieu d'un hash).
 
 ## Étape 6 : Ajouter à HACS (optionnel)
 
@@ -72,4 +78,3 @@ git push
 # Créer une nouvelle branche
 git checkout -b feature/nouvelle-fonctionnalite
 ```
-

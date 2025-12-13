@@ -672,6 +672,13 @@ Si quelque chose ne fonctionne pas, consultez les logs :
 - Redémarrez Home Assistant
 - Vérifiez la connectivité réseau
 
+## Versionnement & Releases
+
+- L'intégration suit le [versionnement sémantique](https://semver.org/lang/fr/) et la version courante est stockée dans le fichier `VERSION` ainsi que dans `manifest.json`.
+- Exécutez `./scripts/bump_version.py 1.1.0` (en adaptant la valeur) pour mettre à jour toutes les références et générer un nouveau bloc dans le changelog.
+- Validez vos changements puis créez un tag `git tag -a v1.1.0 -m "Release v1.1.0"` et poussez-le (`git push --tags`).
+- Un workflow GitHub Actions (`.github/workflows/release.yml`) publie automatiquement une release GitHub dès qu'un tag `v*` est poussé, ce qui permet à HACS d'afficher une version lisible comme `1.1.0`.
+
 ## Compatibilité
 
 - Home Assistant 2023.1.0 ou supérieur

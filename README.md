@@ -672,6 +672,13 @@ If something doesn't work, check the logs:
 - Restart Home Assistant
 - Check network connectivity
 
+## Versioning & Releases
+
+- The integration follows [Semantic Versioning](https://semver.org) and the current version is stored in the `VERSION` file as well as `manifest.json`.
+- Run `./scripts/bump_version.py 1.1.0` (replace with the desired number) to update all version references and create a new changelog stub.
+- Commit the changes, then tag the release with `git tag -a v1.1.0 -m "Release v1.1.0"` and push the tag (`git push --tags`).
+- A GitHub Actions workflow (`.github/workflows/release.yml`) automatically publishes a GitHub release when a `v*` tag is pushed, ensuring HACS can download a human-readable version such as `1.1.0`.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -693,4 +700,3 @@ Developed by Jack
 ## Support
 
 If you encounter any issues, please [open an issue](https://github.com/Jackngl/pioneer_avr_lx83/issues) on GitHub.
-
