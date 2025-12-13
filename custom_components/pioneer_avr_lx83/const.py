@@ -1,10 +1,16 @@
 """Constants for the Pioneer AVR LX83 integration."""
 from homeassistant.components.media_player import MediaPlayerEntityFeature
+from homeassistant.const import STATE_OFF, STATE_ON
 
 DOMAIN = "pioneer_avr_lx83"
 DEFAULT_NAME = "Pioneer AVR"
 DEFAULT_PORT = 23
 DEFAULT_TIMEOUT = 5
+
+# Update intervals
+SCAN_INTERVAL = 10  # seconds
+MAX_RETRIES = 3
+RETRY_DELAY = 1  # seconds
 
 # Configuration
 CONF_SOURCES = "sources"

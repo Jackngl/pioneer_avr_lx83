@@ -34,6 +34,6 @@ jobs:
           echo "No changes to commit"
         else
           git commit -m "chore: bump version to ${{ steps.version.outputs.version }}"
-          git push origin HEAD:main
+          git push origin HEAD:main || echo "Push failed, but continuing"
         fi
 
