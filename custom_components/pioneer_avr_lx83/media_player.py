@@ -36,6 +36,8 @@ from .const import (
     RETRY_DELAY,
     SCAN_INTERVAL,
     SUPPORT_PIONEER,
+    VOLUME_DB_OFFSET,
+    VOLUME_MAX,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -84,6 +86,7 @@ class PioneerAVR(MediaPlayerEntity):
         self._name = name
         self._state = STATE_OFF
         self._volume = 0.0
+        self._volume_step = 0
         self._is_muted = False
         self._source = None
         self._sources = DEFAULT_SOURCES
@@ -132,6 +135,14 @@ class PioneerAVR(MediaPlayerEntity):
         """Return if the device is available."""
         return self._available
 
+    @property
+    def extra_state_attributes(self) -> dict[str, float | int]:
+        """Expose raw Pioneer volume step and approximate dB."""
+        return {
+            "volume_step": self._volume_step,
+            "volume_db": self._step_to_db(self._volume_step),
+        }
+
     async def async_turn_on(self) -> None:
         """Turn the media player on."""
         await self._send_command(CMD_POWER_ON)
@@ -148,23 +159,24 @@ class PioneerAVR(MediaPlayerEntity):
         """Volume up media player."""
         await self._send_command(CMD_VOLUME_UP)
         # Mise à jour approximative du volume pour feedback immédiat
-        if self._volume < 1.0:
-            self._volume = min(self._volume + 0.01, 1.0)
-            self.async_write_ha_state()
+        self._volume_step = self._clamp_volume_step(self._volume_step + 1)
+        self._volume = self._step_to_level(self._volume_step)
+        self.async_write_ha_state()
 
     async def async_volume_down(self) -> None:
         """Volume down media player."""
         await self._send_command(CMD_VOLUME_DOWN)
         # Mise à jour approximative du volume pour feedback immédiat
-        if self._volume > 0.0:
-            self._volume = max(self._volume - 0.01, 0.0)
-            self.async_write_ha_state()
+        self._volume_step = self._clamp_volume_step(self._volume_step - 1)
+        self._volume = self._step_to_level(self._volume_step)
+        self.async_write_ha_state()
 
     async def async_set_volume_level(self, volume: float) -> None:
         """Set volume level, range 0..1."""
-        volume_int = int(volume * 185)
+        volume_int = self._clamp_volume_step(int(volume * VOLUME_MAX))
         await self._send_command(f"{volume_int:03d}{CMD_VOLUME}")
-        self._volume = volume
+        self._volume_step = volume_int
+        self._volume = self._step_to_level(volume_int)
         self.async_write_ha_state()
 
     async def async_mute_volume(self, mute: bool) -> None:
@@ -209,7 +221,8 @@ class PioneerAVR(MediaPlayerEntity):
                         # Chercher tous les chiffres après "VOL"
                         if "VOL" in vol_str:
                             vol_value = int(vol_str.replace("VOL", ""))
-                            self._volume = vol_value / 185.0
+                            self._volume_step = vol_value
+                            self._volume = self._step_to_level(vol_value)
                     except (ValueError, AttributeError, UnicodeDecodeError) as err:
                         _LOGGER.debug("Error parsing volume response: %s", err)
 
@@ -335,6 +348,10 @@ class PioneerAVR(MediaPlayerEntity):
                 else:
                     raise
 
+    def _clamp_volume_step(self, step: int) -> int:
+        """Ensure the raw volume step stays within Pioneer limits."""
+        return max(0, min(VOLUME_MAX, step))
+
     def _ensure_socket(self) -> socket.socket:
         """Return an active socket connection, opening it if needed."""
         if self._socket is not None:
@@ -388,3 +405,11 @@ class PioneerAVR(MediaPlayerEntity):
                 break
 
         return response
+
+    def _step_to_level(self, step: int) -> float:
+        """Convert Pioneer step (0-185) to HA 0..1 scale."""
+        return step / VOLUME_MAX
+
+    def _step_to_db(self, step: int) -> float:
+        """Convert Pioneer step to approximate dB shown on AVR in relative mode."""
+        return step - VOLUME_DB_OFFSET
