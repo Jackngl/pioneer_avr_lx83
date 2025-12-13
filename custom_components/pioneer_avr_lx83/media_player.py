@@ -225,11 +225,15 @@ class PioneerAVR(MediaPlayerEntity):
 
     async def async_select_source(self, source: str) -> None:
         """Select input source."""
-        if source in self._sources:
-            source_code = self._sources[source]
-            await self._send_command(f"{CMD_SOURCE}{source_code}")
-            self._source = source
-            self.async_write_ha_state()
+        resolved = self._resolve_source_code(source)
+        if not resolved:
+            _LOGGER.debug("Unknown source '%s' requested", source)
+            return
+
+        source_code, canonical_name = resolved
+        await self._send_command(f"{source_code}{CMD_SOURCE}")
+        self._source = canonical_name
+        self.async_write_ha_state()
 
     async def async_update(self) -> None:
         """Get the latest details from the device."""
@@ -343,6 +347,21 @@ class PioneerAVR(MediaPlayerEntity):
         if clean_name not in self._sources:
             self._sources[clean_name] = clean_code
         self._source_code_to_name.setdefault(clean_code, clean_name)
+
+    def _resolve_source_code(self, label: str) -> tuple[str, str] | None:
+        """Return (code, canonical_name) for a source label, case-insensitively."""
+        if not label:
+            return None
+        clean_label = label.strip()
+        if not clean_label:
+            return None
+        if clean_label in self._sources:
+            return self._sources[clean_label], clean_label
+        lowered = clean_label.lower()
+        for existing, code in self._sources.items():
+            if existing.lower() == lowered:
+                return code, existing
+        return None
 
     def _name_for_code(self, code: str) -> str:
         """Return a friendly label for a source code."""

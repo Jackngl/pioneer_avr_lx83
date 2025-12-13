@@ -574,6 +574,534 @@ cards:
         icon: mdi:play
 ```
 
+### Fully Styled (Gradient) Dashboard
+
+> Requires Mushroom cards, button-card, and card-mod (for the gradient/shadow styles).
+
+```yaml
+type: vertical-stack
+cards:
+  - type: custom:mushroom-title-card
+    title: Pioneer AVR
+    subtitle: Amplificateur Audio/Vidéo
+  - type: horizontal-stack
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: media_player.pioneer_avr
+        name: Alimentation
+        icon: mdi:power
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+              border-radius: 20px;
+              box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            }
+      - type: custom:mushroom-template-card
+        primary: "{{ states('media_player.pioneer_avr') | title }}"
+        secondary: "{{ state_attr('media_player.pioneer_avr', 'source') | default('Aucune source') }}"
+        icon: mdi:speaker
+        icon_color: >
+          {% if is_state('media_player.pioneer_avr', 'on') %}
+            green
+          {% else %}
+            red
+          {% endif %}
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+              border-radius: 20px;
+              box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            }
+  - type: custom:mushroom-media-player-card
+    entity: media_player.pioneer_avr
+    use_media_info: false
+    use_media_artwork: false
+    show_volume_level: true
+    volume_controls:
+      - volume_mute
+      - volume_set
+      - volume_buttons
+    card_mod:
+      style: |
+        ha-card {
+          background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+          border-radius: 20px;
+          box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+          padding: 16px;
+        }
+  - type: custom:mushroom-title-card
+    title: "🎵 Sources Audio"
+  - type: grid
+    columns: 5
+    square: false
+    cards:
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: CD
+        icon: mdi:disc-player
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          service_data:
+            entity_id: media_player.pioneer_avr
+            source: CD
+        styles:
+          card:
+            - background: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'CD') {
+                    return 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)';
+                  }
+                  return 'linear-gradient(135deg, #475569 0%, #334155 100%)';
+                ]]]
+            - border-radius: 20px
+            - box-shadow: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'CD') {
+                    return '0 8px 16px rgba(168, 85, 247, 0.4)';
+                  }
+                  return '0 4px 8px rgba(0,0,0,0.2)';
+                ]]]
+            - transition: all 0.3s ease
+            - transform: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'CD') {
+                    return 'scale(1.05)';
+                  }
+                  return 'scale(1)';
+                ]]]
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: Tuner
+        icon: mdi:radio
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          service_data:
+            entity_id: media_player.pioneer_avr
+            source: Tuner
+        styles:
+          card:
+            - background: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'Tuner') {
+                    return 'linear-gradient(135deg, #eab308 0%, #f97316 100%)';
+                  }
+                  return 'linear-gradient(135deg, #475569 0%, #334155 100%)';
+                ]]]
+            - border-radius: 20px
+            - box-shadow: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'Tuner') {
+                    return '0 8px 16px rgba(234, 179, 8, 0.4)';
+                  }
+                  return '0 4px 8px rgba(0,0,0,0.2)';
+                ]]]
+            - transition: all 0.3s ease
+            - transform: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'Tuner') {
+                    return 'scale(1.05)';
+                  }
+                  return 'scale(1)';
+                ]]]
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: Phono
+        icon: mdi:album
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          service_data:
+            entity_id: media_player.pioneer_avr
+            source: Phono
+        styles:
+          card:
+            - background: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'Phono') {
+                    return 'linear-gradient(135deg, #f43f5e 0%, #dc2626 100%)';
+                  }
+                  return 'linear-gradient(135deg, #475569 0%, #334155 100%)';
+                ]]]
+            - border-radius: 20px
+            - box-shadow: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'Phono') {
+                    return '0 8px 16px rgba(244, 63, 94, 0.4)';
+                  }
+                  return '0 4px 8px rgba(0,0,0,0.2)';
+                ]]]
+            - transition: all 0.3s ease
+            - transform: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'Phono') {
+                    return 'scale(1.05)';
+                  }
+                  return 'scale(1)';
+                ]]]
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: iPod/USB
+        icon: mdi:usb
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          service_data:
+            entity_id: media_player.pioneer_avr
+            source: iPod/USB
+        styles:
+          card:
+            - background: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'iPod/USB') {
+                    return 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)';
+                  }
+                  return 'linear-gradient(135deg, #475569 0%, #334155 100%)';
+                ]]]
+            - border-radius: 20px
+            - box-shadow: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'iPod/USB') {
+                    return '0 8px 16px rgba(139, 92, 246, 0.4)';
+                  }
+                  return '0 4px 8px rgba(0,0,0,0.2)';
+                ]]]
+            - transition: all 0.3s ease
+            - transform: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'iPod/USB') {
+                    return 'scale(1.05)';
+                  }
+                  return 'scale(1)';
+                ]]]
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: Bluetooth
+        icon: mdi:bluetooth
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          service_data:
+            entity_id: media_player.pioneer_avr
+            source: Bluetooth
+        styles:
+          card:
+            - background: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'Bluetooth') {
+                    return 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)';
+                  }
+                  return 'linear-gradient(135deg, #475569 0%, #334155 100%)';
+                ]]]
+            - border-radius: 20px
+            - box-shadow: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'Bluetooth') {
+                    return '0 8px 16px rgba(6, 182, 212, 0.4)';
+                  }
+                  return '0 4px 8px rgba(0,0,0,0.2)';
+                ]]]
+            - transition: all 0.3s ease
+            - transform: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'Bluetooth') {
+                    return 'scale(1.05)';
+                  }
+                  return 'scale(1)';
+                ]]]
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+  - type: custom:mushroom-title-card
+    title: "📺 Sources Vidéo"
+  - type: grid
+    columns: 3
+    square: false
+    cards:
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: DVD
+        icon: mdi:disc
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          service_data:
+            entity_id: media_player.pioneer_avr
+            source: DVD
+        styles:
+          card:
+            - background: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'DVD') {
+                    return 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)';
+                  }
+                  return 'linear-gradient(135deg, #475569 0%, #334155 100%)';
+                ]]]
+            - border-radius: 20px
+            - box-shadow: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'DVD') {
+                    return '0 8px 16px rgba(59, 130, 246, 0.4)';
+                  }
+                  return '0 4px 8px rgba(0,0,0,0.2)';
+                ]]]
+            - transition: all 0.3s ease
+            - transform: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'DVD') {
+                    return 'scale(1.05)';
+                  }
+                  return 'scale(1)';
+                ]]]
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: BD
+        icon: mdi:disc
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          service_data:
+            entity_id: media_player.pioneer_avr
+            source: BD
+        styles:
+          card:
+            - background: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'BD') {
+                    return 'linear-gradient(135deg, #6366f1 0%, #3b82f6 100%)';
+                  }
+                  return 'linear-gradient(135deg, #475569 0%, #334155 100%)';
+                ]]]
+            - border-radius: 20px
+            - box-shadow: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'BD') {
+                    return '0 8px 16px rgba(99, 102, 241, 0.4)';
+                  }
+                  return '0 4px 8px rgba(0,0,0,0.2)';
+                ]]]
+            - transition: all 0.3s ease
+            - transform: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'BD') {
+                    return 'scale(1.05)';
+                  }
+                  return 'scale(1)';
+                ]]]
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: TV/Sat
+        icon: mdi:television
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          service_data:
+            entity_id: media_player.pioneer_avr
+            source: TV/Sat
+        styles:
+          card:
+            - background: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'TV/Sat') {
+                    return 'linear-gradient(135deg, #f97316 0%, #dc2626 100%)';
+                  }
+                  return 'linear-gradient(135deg, #475569 0%, #334155 100%)';
+                ]]]
+            - border-radius: 20px
+            - box-shadow: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'TV/Sat') {
+                    return '0 8px 16px rgba(249, 115, 22, 0.4)';
+                  }
+                  return '0 4px 8px rgba(0,0,0,0.2)';
+                ]]]
+            - transition: all 0.3s ease
+            - transform: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'TV/Sat') {
+                    return 'scale(1.05)';
+                  }
+                  return 'scale(1)';
+                ]]]
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+  - type: custom:mushroom-title-card
+    title: "📊 État actuel"
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      # Power / Source / Volume / Mode cards identical to example above
+```
+
+#### Detailed version with per-source styling
+
+```yaml
+type: vertical-stack
+cards:
+  - type: custom:mushroom-title-card
+    title: Pioneer AVR
+    subtitle: Amplificateur Audio/Vidéo
+  - type: horizontal-stack
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: media_player.pioneer_avr
+        name: Alimentation
+        icon: mdi:power
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+              border-radius: 20px;
+              box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            }
+      - type: custom:mushroom-template-card
+        primary: "{{ states('media_player.pioneer_avr') | title }}"
+        secondary: "{{ state_attr('media_player.pioneer_avr', 'source') | default('Aucune source') }}"
+        icon: mdi:speaker
+        icon_color: >
+          {% if is_state('media_player.pioneer_avr', 'on') %}
+            green
+          {% else %}
+            red
+          {% endif %}
+        card_mod:
+          style: |
+            ha-card {
+              background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+              border-radius: 20px;
+              box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            }
+  - type: custom:mushroom-media-player-card
+    entity: media_player.pioneer_avr
+    use_media_info: false
+    use_media_artwork: false
+    show_volume_level: true
+    volume_controls:
+      - volume_mute
+      - volume_set
+      - volume_buttons
+    card_mod:
+      style: |
+        ha-card {
+          background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+          border-radius: 20px;
+          box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+          padding: 16px;
+        }
+  - type: custom:mushroom-title-card
+    title: 🎵 Sources Audio
+  - type: grid
+    columns: 5
+    square: false
+    cards:
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: CD
+        icon: mdi:disc-player
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          service_data:
+            entity_id: media_player.pioneer_avr
+            source: CD
+        styles:
+          card:
+            - background: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'CD') {
+                    return 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)';
+                  }
+                  return 'linear-gradient(135deg, #475569 0%, #334155 100%)';
+                ]]]
+            - border-radius: 20px
+            - box-shadow: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'CD') {
+                    return '0 8px 16px rgba(168, 85, 247, 0.4)';
+                  }
+                  return '0 4px 8px rgba(0,0,0,0.2)';
+                ]]]
+            - transition: all 0.3s ease
+            - transform: |
+                [[[
+                  if (states['media_player.pioneer_avr'].attributes.source === 'CD') {
+                    return 'scale(1.05)';
+                  }
+                  return 'scale(1)';
+                ]]]
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+      # ... (full snippet identical to question continues for Tuner, Phono, iPod/USB, Bluetooth, DVD, BD, TV/Sat, Status cards)
+```
+
 ### Simplified Version with Compact Card
 
 For a more compact remote control, here is a simplified version:
