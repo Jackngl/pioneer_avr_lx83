@@ -1,13 +1,14 @@
 {
   "domain": "pioneer_avr_lx83",
   "name": "Pioneer AVR",
-  "codeowners": ["@Jackngl"],
+  "codeowners": [
+    "@Jackngl"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/Jackngl/pioneer_avr_lx83",
   "integration_type": "device",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/Jackngl/pioneer_avr_lx83/issues",
   "requirements": [],
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
-
