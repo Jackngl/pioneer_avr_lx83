@@ -1,11 +1,10 @@
 """Support for Pioneer AVR LX83 receivers."""
 from __future__ import annotations
 
+import asyncio
 import logging
 import socket
-import telnetlib
 import time
-from typing import Any
 
 from homeassistant.components.media_player import MediaPlayerEntity
 from homeassistant.config_entries import ConfigEntry
@@ -23,9 +22,11 @@ from .const import (
     CMD_SOURCE,
     CMD_SOURCE_QUERY,
     CMD_VOLUME,
+    CMD_VOLUME_DOWN,
     CMD_VOLUME_QUERY,
     CMD_VOLUME_UP,
-    CMD_VOLUME_DOWN,
+    COMMAND_PAUSE,
+    COMMAND_TERMINATOR,
     DEFAULT_NAME,
     DEFAULT_PORT,
     DEFAULT_SOURCES,
@@ -33,8 +34,8 @@ from .const import (
     DOMAIN,
     MAX_RETRIES,
     RETRY_DELAY,
-    SUPPORT_PIONEER,
     SCAN_INTERVAL,
+    SUPPORT_PIONEER,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -59,6 +60,8 @@ class PioneerAVR(MediaPlayerEntity):
     _attr_has_entity_name = True
     _attr_name = None
     _attr_icon = "mdi:amplifier"
+    _attr_should_poll = True
+    _attr_scan_interval = SCAN_INTERVAL
 
     def __init__(
         self,
@@ -86,6 +89,7 @@ class PioneerAVR(MediaPlayerEntity):
         self._sources = DEFAULT_SOURCES
         self._available = True
         self._retry_count = 0
+        self._command_lock = asyncio.Lock()
 
     @property
     def name(self) -> str:
@@ -239,94 +243,130 @@ class PioneerAVR(MediaPlayerEntity):
 
     async def _send_command(self, command: str) -> None:
         """Send a command to the Pioneer AVR."""
-        try:
-            await self.hass.async_add_executor_job(
-                self._send_command_sync, command
-            )
-        except (socket.timeout, socket.error, ConnectionRefusedError, OSError) as err:
-            _LOGGER.error("Network error sending command '%s': %s", command, err)
-            self._retry_count += 1
-            if self._retry_count > MAX_RETRIES:
-                self._available = False
-        except Exception as err:
-            _LOGGER.error("Error sending command '%s': %s", command, err)
-            self._retry_count += 1
-            if self._retry_count > MAX_RETRIES:
-                self._available = False
+        async with self._command_lock:
+            try:
+                await self.hass.async_add_executor_job(
+                    self._send_command_sync, command
+                )
+            except (socket.timeout, socket.error, ConnectionRefusedError, OSError) as err:
+                _LOGGER.error("Network error sending command '%s': %s", command, err)
+                self._retry_count += 1
+                if self._retry_count > MAX_RETRIES:
+                    self._available = False
+            except Exception as err:
+                _LOGGER.error("Error sending command '%s': %s", command, err)
+                self._retry_count += 1
+                if self._retry_count > MAX_RETRIES:
+                    self._available = False
 
     async def _send_command_with_response(self, command: str) -> bytes | None:
         """Send a command and get response."""
-        try:
-            return await self.hass.async_add_executor_job(
-                self._send_command_sync_with_response, command
-            )
-        except (socket.timeout, socket.error, ConnectionRefusedError, OSError) as err:
-            _LOGGER.error("Network error sending command '%s': %s", command, err)
-            self._retry_count += 1
-            if self._retry_count > MAX_RETRIES:
-                self._available = False
-            return None
-        except Exception as err:
-            _LOGGER.error("Error sending command '%s': %s", command, err)
-            self._retry_count += 1
-            if self._retry_count > MAX_RETRIES:
-                self._available = False
-            return None
+        async with self._command_lock:
+            try:
+                return await self.hass.async_add_executor_job(
+                    self._send_command_sync_with_response, command
+                )
+            except (socket.timeout, socket.error, ConnectionRefusedError, OSError) as err:
+                _LOGGER.error("Network error sending command '%s': %s", command, err)
+                self._retry_count += 1
+                if self._retry_count > MAX_RETRIES:
+                    self._available = False
+                return None
+            except Exception as err:
+                _LOGGER.error("Error sending command '%s': %s", command, err)
+                self._retry_count += 1
+                if self._retry_count > MAX_RETRIES:
+                    self._available = False
+                return None
 
     def _send_command_sync(self, command: str) -> None:
         """Send command synchronously with retry."""
-        for attempt in range(MAX_RETRIES):
+        for attempt in range(1, MAX_RETRIES + 1):
+            sock: socket.socket | None = None
             try:
-                # Utiliser socket directement au lieu de telnetlib pour un meilleur contrôle
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                    sock.settimeout(DEFAULT_TIMEOUT)
-                    sock.connect((self._host, self._port))
-                    # Ajouter uniquement \r comme terminateur (pas \r\n)
-                    sock.sendall((command + "\r").encode())
-                    return
+                sock = self._open_socket()
+                sock.sendall(self._build_payload(command))
+                time.sleep(COMMAND_PAUSE)
+                return
             except (socket.timeout, socket.error, ConnectionRefusedError, OSError) as err:
                 _LOGGER.error(
-                    "Error sending command '%s' (attempt %d/%d): %s",
-                    command, attempt + 1, MAX_RETRIES, err
+                    "Error sending command '%s' to %s:%s (attempt %d/%d): %s",
+                    command,
+                    self._host,
+                    self._port,
+                    attempt,
+                    MAX_RETRIES,
+                    err,
                 )
-                if attempt < MAX_RETRIES - 1:
+                if attempt < MAX_RETRIES:
                     time.sleep(RETRY_DELAY)
                 else:
                     raise
+            finally:
+                if sock is not None:
+                    try:
+                        sock.close()
+                    except OSError:
+                        pass
 
     def _send_command_sync_with_response(self, command: str) -> bytes:
         """Send command and get response synchronously with retry."""
-        for attempt in range(MAX_RETRIES):
+        for attempt in range(1, MAX_RETRIES + 1):
+            sock: socket.socket | None = None
             try:
-                # Utiliser socket directement au lieu de telnetlib
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                    sock.settimeout(DEFAULT_TIMEOUT)
-                    sock.connect((self._host, self._port))
-                    # Ajouter uniquement \r comme terminateur (pas \r\n)
-                    sock.sendall((command + "\r").encode())
-                    
-                    # Attendre et lire la réponse
-                    response = b""
-                    start_time = time.time()
-                    while time.time() - start_time < DEFAULT_TIMEOUT:
-                        try:
-                            chunk = sock.recv(1024)
-                            if not chunk:
-                                break
-                            response += chunk
-                            # Si on a reçu un terminateur, on arrête
-                            if b"\r" in response or b"\n" in response:
-                                break
-                        except socket.timeout:
-                            break
-                    
-                    return response
+                sock = self._open_socket()
+                sock.sendall(self._build_payload(command))
+                time.sleep(COMMAND_PAUSE)
+                return self._read_response(sock)
             except (socket.timeout, socket.error, ConnectionRefusedError, OSError) as err:
                 _LOGGER.error(
-                    "Error sending command '%s' with response (attempt %d/%d): %s",
-                    command, attempt + 1, MAX_RETRIES, err
+                    "Error sending command '%s' with response to %s:%s (attempt %d/%d): %s",
+                    command,
+                    self._host,
+                    self._port,
+                    attempt,
+                    MAX_RETRIES,
+                    err,
                 )
-                if attempt < MAX_RETRIES - 1:
+                if attempt < MAX_RETRIES:
                     time.sleep(RETRY_DELAY)
                 else:
                     raise
+            finally:
+                if sock is not None:
+                    try:
+                        sock.close()
+                    except OSError:
+                        pass
+
+    def _open_socket(self) -> socket.socket:
+        """Create and return a configured socket connected to the AVR."""
+        sock = socket.create_connection((self._host, self._port), timeout=DEFAULT_TIMEOUT)
+        sock.settimeout(DEFAULT_TIMEOUT)
+        return sock
+
+    def _build_payload(self, command: str) -> bytes:
+        """Return the raw bytes to send for a Pioneer telnet command."""
+        return (command + COMMAND_TERMINATOR).encode()
+
+    def _read_response(self, sock: socket.socket) -> bytes:
+        """Read bytes from the AVR until a terminator or timeout is reached."""
+        response = b""
+        deadline = time.monotonic() + DEFAULT_TIMEOUT
+        terminator = COMMAND_TERMINATOR.encode()
+
+        while time.monotonic() < deadline:
+            try:
+                chunk = sock.recv(1024)
+            except socket.timeout:
+                break
+
+            if not chunk:
+                break
+
+            response += chunk
+
+            if terminator in response or b"\n" in response:
+                break
+
+        return response

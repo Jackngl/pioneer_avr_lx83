@@ -7,11 +7,13 @@ from homeassistant.const import STATE_OFF, STATE_ON
 DOMAIN = "pioneer_avr_lx83"
 DEFAULT_NAME = "Pioneer AVR"
 DEFAULT_PORT = 23
-DEFAULT_TIMEOUT = 15  # seconds instead of 5
+DEFAULT_TIMEOUT = 10  # seconds instead of 5
 # Update intervals
 SCAN_INTERVAL = timedelta(seconds=10)
 MAX_RETRIES = 3
-RETRY_DELAY = 2  # seconds
+RETRY_DELAY = 1  # seconds
+COMMAND_TERMINATOR = "\r"
+COMMAND_PAUSE = 0.15  # seconds between sequential telnet commands
 
 # Configuration
 CONF_SOURCES = "sources"
