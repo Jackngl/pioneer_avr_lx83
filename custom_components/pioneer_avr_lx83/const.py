@@ -1,4 +1,6 @@
 """Constants for the Pioneer AVR LX83 integration."""
+from datetime import timedelta
+
 from homeassistant.components.media_player import MediaPlayerEntityFeature
 from homeassistant.const import STATE_OFF, STATE_ON
 
@@ -8,7 +10,7 @@ DEFAULT_PORT = 23
 DEFAULT_TIMEOUT = 5
 
 # Update intervals
-SCAN_INTERVAL = 10  # seconds
+SCAN_INTERVAL = timedelta(seconds=10)
 MAX_RETRIES = 3
 RETRY_DELAY = 1  # seconds
 
