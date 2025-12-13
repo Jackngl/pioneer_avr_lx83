@@ -50,9 +50,11 @@ DEFAULT_SOURCES = {
     "HDMI 4": "22",
     "HDMI 5": "23",
     "BD": "25",
+    "BLU-RAY": "25",
     "HMG": "26",
     "HDMI CYCL": "31",
     "ADAPTER PORT": "33",
+    "BLUETOOTH": "33",
 }
 
 # Commands

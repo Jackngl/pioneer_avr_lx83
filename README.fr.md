@@ -69,15 +69,11 @@ Une fois configuré, l'intégration crée **une seule entité** sous le domaine 
 
 ## Sources supportées
 
-- CD
-- Tuner
-- Phono
-- DVD
-- TV/Sat
-- DVR/BDR
-- Video
-- iPod/USB
-- NET
+- Analogiques : Phono, CD, Tuner, CDR/Tape, Video 1/2, Multi CH IN
+- Numériques : DVD, TV/SAT, DVR/BDR, iPod/USB, XM Radio, NET/HMG
+- Entrées HDMI 1 → 5 (ainsi que HDMI Cycle)
+- BD / Blu-ray
+- Port adaptateur / Bluetooth
 
 ## Automatisations
 

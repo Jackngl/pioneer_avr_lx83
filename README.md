@@ -69,15 +69,11 @@ Once configured, the integration creates **one entity** under the `media_player`
 
 ## Supported Sources
 
-- CD
-- Tuner
-- Phono
-- DVD
-- TV/Sat
-- DVR/BDR
-- Video
-- iPod/USB
-- NET
+- Analog: Phono, CD, Tuner, CDR/Tape, Video 1/2, Multi CH IN
+- Digital: DVD, TV/SAT, DVR/BDR, iPod/USB, XM Radio, NET/HMG
+- HDMI inputs 1 → 5 (plus HDMI Cycle)
+- BD / Blu-ray
+- Adapter / Bluetooth port
 
 ## Automations
 
