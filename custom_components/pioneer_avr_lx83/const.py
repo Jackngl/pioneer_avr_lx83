@@ -7,8 +7,7 @@ from homeassistant.const import STATE_OFF, STATE_ON
 DOMAIN = "pioneer_avr_lx83"
 DEFAULT_NAME = "Pioneer AVR"
 DEFAULT_PORT = 23
-DEFAULT_TIMEOUT = 5
-
+DEFAULT_TIMEOUT = 10  # seconds instead of 5
 # Update intervals
 SCAN_INTERVAL = timedelta(seconds=10)
 MAX_RETRIES = 3
@@ -51,4 +50,3 @@ CMD_MUTE_OFF = "MF"
 CMD_MUTE_QUERY = "?M"
 CMD_SOURCE = "FN"
 CMD_SOURCE_QUERY = "?F"
-

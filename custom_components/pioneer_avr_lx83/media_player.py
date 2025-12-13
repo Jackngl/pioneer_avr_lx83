@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import logging
+import socket
 import telnetlib
+import time
 from typing import Any
 
 from homeassistant.components.media_player import MediaPlayerEntity
@@ -27,6 +29,8 @@ from .const import (
     DEFAULT_SOURCES,
     DEFAULT_TIMEOUT,
     DOMAIN,
+    MAX_RETRIES,
+    RETRY_DELAY,
     SUPPORT_PIONEER,
     SCAN_INTERVAL,
 )
@@ -79,6 +83,7 @@ class PioneerAVR(MediaPlayerEntity):
         self._source = None
         self._sources = DEFAULT_SOURCES
         self._available = True
+        self._retry_count = 0
 
     @property
     def name(self) -> str:
@@ -176,8 +181,11 @@ class PioneerAVR(MediaPlayerEntity):
             if power_response:
                 self._state = STATE_ON if b"PWR0" in power_response else STATE_OFF
                 self._available = True
+                self._retry_count = 0  # Reset retry count on successful update
             else:
-                self._available = False
+                self._retry_count += 1
+                if self._retry_count > MAX_RETRIES:
+                    self._available = False
                 return
 
             if self._state == STATE_ON:
@@ -188,8 +196,8 @@ class PioneerAVR(MediaPlayerEntity):
                         vol_str = volume_response.decode().strip()
                         vol_value = int(vol_str.replace("VOL", ""))
                         self._volume = vol_value / 185.0
-                    except (ValueError, AttributeError):
-                        pass
+                    except (ValueError, AttributeError) as err:
+                        _LOGGER.debug("Error parsing volume response: %s", err)
 
                 # Query mute state
                 mute_response = await self._send_command_with_response(CMD_MUTE_QUERY)
@@ -206,12 +214,14 @@ class PioneerAVR(MediaPlayerEntity):
                             if code == src_code:
                                 self._source = name
                                 break
-                    except (ValueError, AttributeError):
-                        pass
+                    except (ValueError, AttributeError) as err:
+                        _LOGGER.debug("Error parsing source response: %s", err)
 
         except Exception as err:
             _LOGGER.error("Error updating Pioneer AVR: %s", err)
-            self._available = False
+            self._retry_count += 1
+            if self._retry_count > MAX_RETRIES:
+                self._available = False
 
     async def _send_command(self, command: str) -> None:
         """Send a command to the Pioneer AVR."""
@@ -219,9 +229,16 @@ class PioneerAVR(MediaPlayerEntity):
             await self.hass.async_add_executor_job(
                 self._send_command_sync, command
             )
+        except (socket.timeout, socket.error, OSError) as err:
+            _LOGGER.error("Network error sending command '%s': %s", command, err)
+            self._retry_count += 1
+            if self._retry_count > MAX_RETRIES:
+                self._available = False
         except Exception as err:
             _LOGGER.error("Error sending command '%s': %s", command, err)
-            self._available = False
+            self._retry_count += 1
+            if self._retry_count > MAX_RETRIES:
+                self._available = False
 
     async def _send_command_with_response(self, command: str) -> bytes | None:
         """Send a command and get response."""
@@ -229,18 +246,49 @@ class PioneerAVR(MediaPlayerEntity):
             return await self.hass.async_add_executor_job(
                 self._send_command_sync_with_response, command
             )
+        except (socket.timeout, socket.error, OSError) as err:
+            _LOGGER.error("Network error sending command '%s': %s", command, err)
+            self._retry_count += 1
+            if self._retry_count > MAX_RETRIES:
+                self._available = False
+            return None
         except Exception as err:
             _LOGGER.error("Error sending command '%s': %s", command, err)
-            self._available = False
+            self._retry_count += 1
+            if self._retry_count > MAX_RETRIES:
+                self._available = False
             return None
 
     def _send_command_sync(self, command: str) -> None:
-        """Send command synchronously."""
-        with telnetlib.Telnet(self._host, self._port, timeout=DEFAULT_TIMEOUT) as tn:
-            tn.write(command.encode() + b"\r\n")
+        """Send command synchronously with retry."""
+        for attempt in range(MAX_RETRIES):
+            try:
+                with telnetlib.Telnet(self._host, self._port, timeout=DEFAULT_TIMEOUT) as tn:
+                    tn.write(command.encode() + b"\r\n")
+                    return
+            except (socket.timeout, socket.error, OSError) as err:
+                _LOGGER.error(
+                    "Error sending command '%s' (attempt %d/%d): %s",
+                    command, attempt + 1, MAX_RETRIES, err
+                )
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(RETRY_DELAY)
+                else:
+                    raise
 
     def _send_command_sync_with_response(self, command: str) -> bytes:
-        """Send command and get response synchronously."""
-        with telnetlib.Telnet(self._host, self._port, timeout=DEFAULT_TIMEOUT) as tn:
-            tn.write(command.encode() + b"\r\n")
-            return tn.read_until(b"\r\n", timeout=DEFAULT_TIMEOUT)
+        """Send command and get response synchronously with retry."""
+        for attempt in range(MAX_RETRIES):
+            try:
+                with telnetlib.Telnet(self._host, self._port, timeout=DEFAULT_TIMEOUT) as tn:
+                    tn.write(command.encode() + b"\r\n")
+                    return tn.read_until(b"\r\n", timeout=DEFAULT_TIMEOUT)
+            except (socket.timeout, socket.error, OSError) as err:
+                _LOGGER.error(
+                    "Error sending command '%s' with response (attempt %d/%d): %s",
+                    command, attempt + 1, MAX_RETRIES, err
+                )
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(RETRY_DELAY)
+                else:
+                    raise
