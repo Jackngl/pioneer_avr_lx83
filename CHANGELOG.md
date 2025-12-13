@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.1] - 2025-12-13
 
 - Improved telnet stability and added versioning workflow
+- Added media transport commands (play/pause)
+- Discovered source labels dynamically via `?RGBxx` when available
 
 ## [1.0.0] - 2025-01-XX
 
@@ -22,4 +24,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for multiple input sources (CD, Tuner, Phono, DVD, TV/Sat, DVR/BDR, Video, iPod/USB, NET)
 - English and French translations
 - HACS compatibility
-

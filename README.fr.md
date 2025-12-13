@@ -13,9 +13,11 @@ Intégration personnalisée Home Assistant pour les récepteurs Pioneer AVR LX83
 - ✅ Activer/désactiver le mode muet
 - ✅ Sélection de la source d'entrée
 - ✅ Mises à jour d'état en temps réel
+- ✅ Commandes de transport de base (lecture/pause)
 - ✅ Configuration via l'interface utilisateur
 - ✅ Compatible HACS
 - ✅ Utilise DataUpdateCoordinator (conforme HA 2025.12+)
+- ✅ Découverte automatique des sources (`?RGBxx`)
 
 ## Installation
 
@@ -74,6 +76,8 @@ Une fois configuré, l'intégration crée **une seule entité** sous le domaine 
 - Entrées HDMI 1 → 5 (ainsi que HDMI Cycle)
 - BD / Blu-ray
 - Port adaptateur / Bluetooth
+
+> Astuce : lorsque l'ampli est allumé, l'intégration interroge automatiquement `?RGBxx` et ajoute les libellés configurés sur l'appareil en plus de la liste ci-dessus.
 
 ## Automatisations
 
@@ -416,6 +420,158 @@ cards:
         entity: media_player.pioneer_avr
         attribute: is_volume_muted
         name: Mode muet
+```
+
+### Exemple premium avec Mushroom
+
+> Nécessite les cartes Mushroom, button-card et (optionnel) card-mod.
+
+```yaml
+type: vertical-stack
+cards:
+  - type: custom:mushroom-title-card
+    title: Pioneer AVR
+    subtitle: Tableau de bord LX83
+
+  - type: horizontal-stack
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: media_player.pioneer_avr
+        name: Alimentation
+        icon: mdi:power
+        tap_action:
+          action: toggle
+      - type: custom:mushroom-template-card
+        primary: "{{ states('media_player.pioneer_avr') | title }}"
+        secondary: "{{ state_attr('media_player.pioneer_avr','source') | default('Aucune source') }}"
+        icon: mdi:speaker
+        icon_color: >
+          {% if is_state('media_player.pioneer_avr','on') %}green{% else %}red{% endif %}
+
+  - type: custom:mushroom-media-player-card
+    entity: media_player.pioneer_avr
+    show_volume_level: true
+    volume_controls:
+      - volume_mute
+      - volume_set
+      - volume_buttons
+
+  - type: custom:mushroom-title-card
+    title: 🎵 Sources audio
+
+  - type: grid
+    columns: 5
+    square: false
+    cards:
+      - type: custom:button-card
+        name: CD
+        icon: mdi:disc-player
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          data:
+            entity_id: media_player.pioneer_avr
+            source: CD
+      - type: custom:button-card
+        name: Tuner
+        icon: mdi:radio
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          data:
+            entity_id: media_player.pioneer_avr
+            source: Tuner
+      - type: custom:button-card
+        name: Phono
+        icon: mdi:album
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          data:
+            entity_id: media_player.pioneer_avr
+            source: Phono
+      - type: custom:button-card
+        name: iPod/USB
+        icon: mdi:usb
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          data:
+            entity_id: media_player.pioneer_avr
+            source: iPod/USB
+      - type: custom:button-card
+        name: Bluetooth
+        icon: mdi:bluetooth
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          data:
+            entity_id: media_player.pioneer_avr
+            source: Bluetooth
+
+  - type: custom:mushroom-title-card
+    title: 📺 Sources vidéo
+
+  - type: grid
+    columns: 3
+    square: false
+    cards:
+      - type: custom:button-card
+        name: DVD
+        icon: mdi:disc
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          data:
+            entity_id: media_player.pioneer_avr
+            source: DVD
+      - type: custom:button-card
+        name: BD
+        icon: mdi:disc
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          data:
+            entity_id: media_player.pioneer_avr
+            source: BD
+      - type: custom:button-card
+        name: TV/Sat
+        icon: mdi:television
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          data:
+            entity_id: media_player.pioneer_avr
+            source: "TV/Sat"
+
+  - type: custom:mushroom-title-card
+    title: 📊 Statut
+
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: custom:mushroom-template-card
+        primary: Alimentation
+        secondary: "{{ 'Allumé' if is_state('media_player.pioneer_avr','on') else 'Éteint' }}"
+        icon: mdi:power
+      - type: custom:mushroom-template-card
+        primary: Volume
+        secondary: >
+          {% if state_attr('media_player.pioneer_avr','is_volume_muted') %}
+            Muet
+          {% else %}
+            {{ (state_attr('media_player.pioneer_avr','volume_level') * 100) | round }}%
+          {% endif %}
+        icon: mdi:volume-high
+      - type: custom:mushroom-template-card
+        primary: Source
+        secondary: "{{ state_attr('media_player.pioneer_avr','source') | default('Aucune') }}"
+        icon: mdi:import
+      - type: custom:mushroom-template-card
+        primary: Lecture
+        secondary: "{{ states('media_player.pioneer_avr') }}"
+        icon: mdi:play
 ```
 
 ### Version simplifiée avec carte compacte

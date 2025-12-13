@@ -28,7 +28,11 @@ SUPPORT_PIONEER = (
     | MediaPlayerEntityFeature.VOLUME_STEP
     | MediaPlayerEntityFeature.VOLUME_MUTE
     | MediaPlayerEntityFeature.SELECT_SOURCE
+    | MediaPlayerEntityFeature.PLAY
+    | MediaPlayerEntityFeature.PAUSE
 )
+
+MAX_SOURCE_SLOTS = 60
 
 # Default sources mapping - Mis à jour selon la documentation
 DEFAULT_SOURCES = {
@@ -72,11 +76,16 @@ CMD_SOURCE = "FN"
 CMD_SOURCE_QUERY = "?F"
 CMD_SOURCE_UP = "FU"
 CMD_SOURCE_DOWN = "FD"
+CMD_SOURCE_NAME_QUERY = "?RGB"
 
 # Commandes supplémentaires pour les fonctionnalités avancées
 # Mode d'écoute
 CMD_LISTENING_MODE = "SR"
 CMD_LISTENING_MODE_QUERY = "?L"
+
+# Media transport
+CMD_MEDIA_PLAY = "10NW"
+CMD_MEDIA_PAUSE = "11NW"
 
 # Contrôle de tonalité
 CMD_TONE_ON = "TO1"

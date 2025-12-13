@@ -8,7 +8,15 @@ import time
 
 from homeassistant.components.media_player import MediaPlayerEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT, STATE_OFF, STATE_ON
+from homeassistant.const import (
+    CONF_HOST,
+    CONF_NAME,
+    CONF_PORT,
+    STATE_OFF,
+    STATE_ON,
+    STATE_PAUSED,
+    STATE_PLAYING,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -16,10 +24,13 @@ from .const import (
     CMD_MUTE_OFF,
     CMD_MUTE_ON,
     CMD_MUTE_QUERY,
+    CMD_MEDIA_PAUSE,
+    CMD_MEDIA_PLAY,
     CMD_POWER_OFF,
     CMD_POWER_ON,
     CMD_POWER_QUERY,
     CMD_SOURCE,
+    CMD_SOURCE_NAME_QUERY,
     CMD_SOURCE_QUERY,
     CMD_VOLUME,
     CMD_VOLUME_DOWN,
@@ -32,6 +43,7 @@ from .const import (
     DEFAULT_SOURCES,
     DEFAULT_TIMEOUT,
     DOMAIN,
+    MAX_SOURCE_SLOTS,
     MAX_RETRIES,
     RETRY_DELAY,
     SCAN_INTERVAL,
@@ -84,16 +96,21 @@ class PioneerAVR(MediaPlayerEntity):
         self._host = host
         self._port = port
         self._name = name
-        self._state = STATE_OFF
+        self._power_state = STATE_OFF
+        self._playback_state: str | None = None
         self._volume = 0.0
         self._volume_step = 0
         self._is_muted = False
         self._source = None
-        self._sources = DEFAULT_SOURCES
+        self._sources = dict(DEFAULT_SOURCES)
+        self._source_code_to_name = {
+            code: name for name, code in self._sources.items()
+        }
         self._available = True
         self._retry_count = 0
         self._command_lock = asyncio.Lock()
         self._socket: socket.socket | None = None
+        self._dynamic_sources_loaded = False
 
     @property
     def name(self) -> str:
@@ -103,7 +120,9 @@ class PioneerAVR(MediaPlayerEntity):
     @property
     def state(self) -> str:
         """Return the state of the device."""
-        return self._state
+        if self._power_state == STATE_OFF:
+            return STATE_OFF
+        return self._playback_state or STATE_ON
 
     @property
     def volume_level(self) -> float:
@@ -146,13 +165,15 @@ class PioneerAVR(MediaPlayerEntity):
     async def async_turn_on(self) -> None:
         """Turn the media player on."""
         await self._send_command(CMD_POWER_ON)
-        self._state = STATE_ON
+        self._power_state = STATE_ON
+        self._playback_state = None
         self.async_write_ha_state()
 
     async def async_turn_off(self) -> None:
         """Turn off media player."""
         await self._send_command(CMD_POWER_OFF)
-        self._state = STATE_OFF
+        self._power_state = STATE_OFF
+        self._playback_state = None
         self.async_write_ha_state()
 
     async def async_volume_up(self) -> None:
@@ -170,6 +191,20 @@ class PioneerAVR(MediaPlayerEntity):
         self._volume_step = self._clamp_volume_step(self._volume_step - 1)
         self._volume = self._step_to_level(self._volume_step)
         self.async_write_ha_state()
+
+    async def async_media_play(self) -> None:
+        """Send play command."""
+        await self._send_command(CMD_MEDIA_PLAY)
+        if self._power_state != STATE_OFF:
+            self._playback_state = STATE_PLAYING
+            self.async_write_ha_state()
+
+    async def async_media_pause(self) -> None:
+        """Send pause command."""
+        await self._send_command(CMD_MEDIA_PAUSE)
+        if self._power_state != STATE_OFF:
+            self._playback_state = STATE_PAUSED
+            self.async_write_ha_state()
 
     async def async_set_volume_level(self, volume: float) -> None:
         """Set volume level, range 0..1."""
@@ -203,7 +238,13 @@ class PioneerAVR(MediaPlayerEntity):
             power_response = await self._send_command_with_response(CMD_POWER_QUERY)
             if power_response:
                 # Vérifier les deux formats possibles de réponse
-                self._state = STATE_ON if (b"PWR0" in power_response or b"PWR2" in power_response) else STATE_OFF
+                self._power_state = (
+                    STATE_ON
+                    if (b"PWR0" in power_response or b"PWR2" in power_response)
+                    else STATE_OFF
+                )
+                if self._power_state == STATE_OFF:
+                    self._playback_state = None
                 self._available = True
                 self._retry_count = 0  # Reset retry count on successful update
             else:
@@ -212,7 +253,9 @@ class PioneerAVR(MediaPlayerEntity):
                     self._available = False
                 return
 
-            if self._state == STATE_ON:
+            if self._power_state == STATE_ON:
+                if not self._dynamic_sources_loaded:
+                    await self._ensure_dynamic_sources()
                 # Query volume
                 volume_response = await self._send_command_with_response(CMD_VOLUME_QUERY)
                 if volume_response:
@@ -241,11 +284,8 @@ class PioneerAVR(MediaPlayerEntity):
                     try:
                         src_str = source_response.decode().strip()
                         if "FN" in src_str:
-                            src_code = src_str.replace("FN", "")
-                            for name, code in self._sources.items():
-                                if code == src_code:
-                                    self._source = name
-                                    break
+                            src_code = src_str.split("FN", 1)[1].strip()
+                            self._source = self._name_for_code(src_code)
                     except (UnicodeDecodeError, AttributeError) as err:
                         _LOGGER.debug("Error parsing source response: %s", err)
 
@@ -259,6 +299,63 @@ class PioneerAVR(MediaPlayerEntity):
         """Close TCP connection when entity is removed."""
         await super().async_will_remove_from_hass()
         await self.hass.async_add_executor_job(self._close_socket)
+
+    async def _ensure_dynamic_sources(self) -> None:
+        """Discover source labels reported by the AVR."""
+        if self._dynamic_sources_loaded:
+            return
+
+        consecutive_misses = 0
+        for idx in range(MAX_SOURCE_SLOTS):
+            code = f"{idx:02d}"
+            response = await self._send_command_with_response(
+                f"{CMD_SOURCE_NAME_QUERY}{code}"
+            )
+            if not response:
+                consecutive_misses += 1
+                if consecutive_misses >= 10:
+                    break
+                continue
+
+            consecutive_misses = 0
+            try:
+                raw = response.decode().strip()
+            except UnicodeDecodeError:
+                continue
+
+            if not raw.startswith("RGB") or len(raw) <= 5:
+                continue
+
+            label = raw[5:].strip()
+            if not label:
+                continue
+
+            self._register_source(label, code)
+
+        self._dynamic_sources_loaded = True
+
+    def _register_source(self, name: str, code: str) -> None:
+        """Store a source label/code pair if not already known."""
+        clean_name = name.strip()
+        clean_code = code.strip()
+        if not clean_name or not clean_code:
+            return
+        if clean_name not in self._sources:
+            self._sources[clean_name] = clean_code
+        self._source_code_to_name.setdefault(clean_code, clean_name)
+
+    def _name_for_code(self, code: str) -> str:
+        """Return a friendly label for a source code."""
+        clean_code = code.strip()
+        if not clean_code:
+            return clean_code
+        if clean_code in self._source_code_to_name:
+            return self._source_code_to_name[clean_code]
+        fallback = f"Input {clean_code}"
+        self._source_code_to_name[clean_code] = fallback
+        if fallback not in self._sources:
+            self._sources[fallback] = clean_code
+        return fallback
 
     async def _send_command(self, command: str) -> None:
         """Send a command to the Pioneer AVR."""
