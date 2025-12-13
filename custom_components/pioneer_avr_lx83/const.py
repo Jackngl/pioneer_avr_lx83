@@ -13,7 +13,7 @@ SCAN_INTERVAL = timedelta(seconds=10)
 MAX_RETRIES = 3
 RETRY_DELAY = 1  # seconds
 COMMAND_TERMINATOR = "\r"
-COMMAND_PAUSE = 0.15  # seconds between sequential telnet commands
+COMMAND_PAUSE = 0.3  # seconds between sequential telnet commands
 
 # Configuration
 CONF_SOURCES = "sources"

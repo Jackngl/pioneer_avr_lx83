@@ -90,6 +90,7 @@ class PioneerAVR(MediaPlayerEntity):
         self._available = True
         self._retry_count = 0
         self._command_lock = asyncio.Lock()
+        self._socket: socket.socket | None = None
 
     @property
     def name(self) -> str:
@@ -241,6 +242,11 @@ class PioneerAVR(MediaPlayerEntity):
             if self._retry_count > MAX_RETRIES:
                 self._available = False
 
+    async def async_will_remove_from_hass(self) -> None:
+        """Close TCP connection when entity is removed."""
+        await super().async_will_remove_from_hass()
+        await self.hass.async_add_executor_job(self._close_socket)
+
     async def _send_command(self, command: str) -> None:
         """Send a command to the Pioneer AVR."""
         async with self._command_lock:
@@ -281,11 +287,11 @@ class PioneerAVR(MediaPlayerEntity):
 
     def _send_command_sync(self, command: str) -> None:
         """Send command synchronously with retry."""
+        payload = self._build_payload(command)
         for attempt in range(1, MAX_RETRIES + 1):
-            sock: socket.socket | None = None
             try:
-                sock = self._open_socket()
-                sock.sendall(self._build_payload(command))
+                sock = self._ensure_socket()
+                sock.sendall(payload)
                 time.sleep(COMMAND_PAUSE)
                 return
             except (socket.timeout, socket.error, ConnectionRefusedError, OSError) as err:
@@ -298,24 +304,19 @@ class PioneerAVR(MediaPlayerEntity):
                     MAX_RETRIES,
                     err,
                 )
+                self._close_socket()
                 if attempt < MAX_RETRIES:
                     time.sleep(RETRY_DELAY)
                 else:
                     raise
-            finally:
-                if sock is not None:
-                    try:
-                        sock.close()
-                    except OSError:
-                        pass
 
     def _send_command_sync_with_response(self, command: str) -> bytes:
         """Send command and get response synchronously with retry."""
+        payload = self._build_payload(command)
         for attempt in range(1, MAX_RETRIES + 1):
-            sock: socket.socket | None = None
             try:
-                sock = self._open_socket()
-                sock.sendall(self._build_payload(command))
+                sock = self._ensure_socket()
+                sock.sendall(payload)
                 time.sleep(COMMAND_PAUSE)
                 return self._read_response(sock)
             except (socket.timeout, socket.error, ConnectionRefusedError, OSError) as err:
@@ -328,22 +329,35 @@ class PioneerAVR(MediaPlayerEntity):
                     MAX_RETRIES,
                     err,
                 )
+                self._close_socket()
                 if attempt < MAX_RETRIES:
                     time.sleep(RETRY_DELAY)
                 else:
                     raise
-            finally:
-                if sock is not None:
-                    try:
-                        sock.close()
-                    except OSError:
-                        pass
 
-    def _open_socket(self) -> socket.socket:
-        """Create and return a configured socket connected to the AVR."""
+    def _ensure_socket(self) -> socket.socket:
+        """Return an active socket connection, opening it if needed."""
+        if self._socket is not None:
+            return self._socket
+
         sock = socket.create_connection((self._host, self._port), timeout=DEFAULT_TIMEOUT)
         sock.settimeout(DEFAULT_TIMEOUT)
+        self._socket = sock
         return sock
+
+    def _close_socket(self) -> None:
+        """Close the reusable socket, ignoring errors."""
+        if self._socket is None:
+            return
+        try:
+            self._socket.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+        try:
+            self._socket.close()
+        except OSError:
+            pass
+        self._socket = None
 
     def _build_payload(self, command: str) -> bytes:
         """Return the raw bytes to send for a Pioneer telnet command."""
@@ -360,8 +374,12 @@ class PioneerAVR(MediaPlayerEntity):
                 chunk = sock.recv(1024)
             except socket.timeout:
                 break
+            except OSError:
+                self._close_socket()
+                break
 
             if not chunk:
+                self._close_socket()
                 break
 
             response += chunk
