@@ -79,7 +79,7 @@ async def async_setup_entry(
     platform = entity_platform.async_get_current_platform()
     platform.async_register_entity_service(
         "send_raw_command",
-        vol.Schema({vol.Required("command"): cv.string}),
+        cv.make_entity_service_schema({vol.Required("command"): cv.string}),
         "async_send_raw_command",
     )
 

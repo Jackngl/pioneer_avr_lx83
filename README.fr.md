@@ -1229,7 +1229,7 @@ cards:
           {% if state_attr('media_player.pioneer_avr', 'is_volume_muted') %}
             🔇 Muet
           {% elif state_attr('media_player.pioneer_avr', 'volume_level') != None %}
-            {{ (state_attr('media_player.pioneer_avr', 'volume_level') * 100) | round }}%
+            {{ ((state_attr('media_player.pioneer_avr', 'volume_level') | float(0)) * 100) | round }}%
           {% else %}
             N/A
           {% endif %}
