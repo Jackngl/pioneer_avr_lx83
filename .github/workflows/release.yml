@@ -15,8 +15,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Generate release notes
+        id: notes
+        run: |
+          VERSION=$(cat VERSION | tr -d '\n')
+          python3 scripts/extract_changelog.py "${VERSION}" > release_notes.md
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           draft: false
           prerelease: false
+          body_path: release_notes.md

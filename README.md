@@ -2131,7 +2131,7 @@ If something doesn't work, check the logs:
 - The integration follows [Semantic Versioning](https://semver.org) and the current version is stored in the `VERSION` file as well as `manifest.json`.
 - Run `./scripts/bump_version.py 1.1.0` (replace with the desired number) to update all version references and create a new changelog stub.
 - Commit the changes, then tag the release with `git tag -a v1.1.0 -m "Release v1.1.0"` and push the tag (`git push --tags`).
-- A GitHub Actions workflow (`.github/workflows/release.yml`) automatically publishes a GitHub release when a `v*` tag is pushed, ensuring HACS can download a human-readable version such as `1.1.0`.
+- A GitHub Actions workflow (`.github/workflows/release.yml`) automatically publishes a GitHub release when a `v*` tag is pushed. It reads the matching entry from `CHANGELOG.md` via `scripts/extract_changelog.py` and uses that text as the release notes, so HACS shows meaningful update information.
 - Another workflow (`release-drafter.yml`) keeps a draft release up-to-date on every push to `main`, so you can just review the generated notes and publish once the tag exists.
 
 ## Contributing
