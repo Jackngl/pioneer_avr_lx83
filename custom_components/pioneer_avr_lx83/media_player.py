@@ -6,6 +6,8 @@ import logging
 import socket
 import time
 
+import voluptuous as vol
+
 from homeassistant.components.media_player import MediaPlayerEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -18,9 +20,12 @@ from homeassistant.const import (
     STATE_PLAYING,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
+    CMD_LISTENING_MODE,
+    CMD_LISTENING_MODE_QUERY,
     CMD_MUTE_OFF,
     CMD_MUTE_ON,
     CMD_MUTE_QUERY,
@@ -38,14 +43,17 @@ from .const import (
     CMD_VOLUME_UP,
     COMMAND_PAUSE,
     COMMAND_TERMINATOR,
+    DEFAULT_LISTENING_MODES,
     DEFAULT_NAME,
     DEFAULT_PORT,
     DEFAULT_SOURCES,
     DEFAULT_TIMEOUT,
     DOMAIN,
+    LISTENING_MODE_ALIASES,
     MAX_SOURCE_SLOTS,
     MAX_RETRIES,
     RETRY_DELAY,
+    SOURCE_ALIASES,
     SCAN_INTERVAL,
     SUPPORT_PIONEER,
     VOLUME_DB_OFFSET,
@@ -65,7 +73,15 @@ async def async_setup_entry(
     port = config_entry.data.get(CONF_PORT, DEFAULT_PORT)
     name = config_entry.data.get(CONF_NAME, DEFAULT_NAME)
 
-    async_add_entities([PioneerAVR(hass, name, host, port)], True)
+    entity = PioneerAVR(hass, name, host, port)
+    async_add_entities([entity], True)
+
+    platform = entity_platform.async_get_current_platform()
+    platform.async_register_entity_service(
+        "send_raw_command",
+        vol.Schema({vol.Required("command"): cv.string}),
+        "async_send_raw_command",
+    )
 
 
 class PioneerAVR(MediaPlayerEntity):
@@ -106,6 +122,20 @@ class PioneerAVR(MediaPlayerEntity):
         self._source_code_to_name = {
             code: name for name, code in self._sources.items()
         }
+        self._source_aliases = {
+            name.lower(): code for name, code in self._sources.items()
+        }
+        self._source_aliases.update(SOURCE_ALIASES)
+        self._sound_mode: str | None = None
+        self._sound_mode_code: str | None = None
+        self._sound_modes = dict(DEFAULT_LISTENING_MODES)
+        self._sound_mode_code_to_name = {
+            code: name for name, code in self._sound_modes.items()
+        }
+        self._sound_mode_aliases = {
+            name.lower(): code for name, code in self._sound_modes.items()
+        }
+        self._sound_mode_aliases.update(LISTENING_MODE_ALIASES)
         self._available = True
         self._retry_count = 0
         self._command_lock = asyncio.Lock()
@@ -145,6 +175,18 @@ class PioneerAVR(MediaPlayerEntity):
         return list(self._sources.keys())
 
     @property
+    def sound_mode(self) -> str | None:
+        """Return current listening mode."""
+        return self._sound_mode
+
+    @property
+    def sound_mode_list(self) -> list[str] | None:
+        """List available listening modes."""
+        if not self._sound_modes:
+            return None
+        return list(self._sound_modes.keys())
+
+    @property
     def supported_features(self) -> int:
         """Flag media player features that are supported."""
         return SUPPORT_PIONEER
@@ -155,11 +197,13 @@ class PioneerAVR(MediaPlayerEntity):
         return self._available
 
     @property
-    def extra_state_attributes(self) -> dict[str, float | int]:
+    def extra_state_attributes(self) -> dict[str, float | int | str | list[str]]:
         """Expose raw Pioneer volume step and approximate dB."""
         return {
             "volume_step": self._volume_step,
             "volume_db": self._step_to_db(self._volume_step),
+            "sound_mode_code": self._sound_mode_code,
+            "available_sound_modes": self.sound_mode_list,
         }
 
     async def async_turn_on(self) -> None:
@@ -235,6 +279,23 @@ class PioneerAVR(MediaPlayerEntity):
         self._source = canonical_name
         self.async_write_ha_state()
 
+    async def async_select_sound_mode(self, sound_mode: str) -> None:
+        """Select listening mode (sound mode)."""
+        resolved = self._resolve_sound_mode(sound_mode)
+        if not resolved:
+            _LOGGER.debug("Unknown sound mode '%s' requested", sound_mode)
+            return
+
+        mode_code, canonical_name = resolved
+        await self._send_command(f"{mode_code}{CMD_LISTENING_MODE}")
+        self._sound_mode_code = mode_code
+        self._sound_mode = canonical_name
+        self.async_write_ha_state()
+
+    async def async_send_raw_command(self, command: str) -> None:
+        """Expose a raw telnet command for advanced cards."""
+        await self._send_command(command)
+
     async def async_update(self) -> None:
         """Get the latest details from the device."""
         try:
@@ -293,6 +354,11 @@ class PioneerAVR(MediaPlayerEntity):
                     except (UnicodeDecodeError, AttributeError) as err:
                         _LOGGER.debug("Error parsing source response: %s", err)
 
+                mode_response = await self._send_command_with_response(
+                    CMD_LISTENING_MODE_QUERY
+                )
+                self._update_sound_mode_from_response(mode_response)
+
         except Exception as err:
             _LOGGER.error("Error updating Pioneer AVR: %s", err)
             self._retry_count += 1
@@ -347,6 +413,7 @@ class PioneerAVR(MediaPlayerEntity):
         if clean_name not in self._sources:
             self._sources[clean_name] = clean_code
         self._source_code_to_name.setdefault(clean_code, clean_name)
+        self._source_aliases[clean_name.lower()] = clean_code
 
     def _resolve_source_code(self, label: str) -> tuple[str, str] | None:
         """Return (code, canonical_name) for a source label, case-insensitively."""
@@ -358,9 +425,10 @@ class PioneerAVR(MediaPlayerEntity):
         if clean_label in self._sources:
             return self._sources[clean_label], clean_label
         lowered = clean_label.lower()
-        for existing, code in self._sources.items():
-            if existing.lower() == lowered:
-                return code, existing
+        alias_code = self._source_aliases.get(lowered)
+        if alias_code:
+            canonical = self._source_code_to_name.get(alias_code, clean_label)
+            return alias_code, canonical
         return None
 
     def _name_for_code(self, code: str) -> str:
@@ -371,10 +439,56 @@ class PioneerAVR(MediaPlayerEntity):
         if clean_code in self._source_code_to_name:
             return self._source_code_to_name[clean_code]
         fallback = f"Input {clean_code}"
-        self._source_code_to_name[clean_code] = fallback
-        if fallback not in self._sources:
-            self._sources[fallback] = clean_code
+        self._register_source(fallback, clean_code)
         return fallback
+
+    def _resolve_sound_mode(self, label: str) -> tuple[str, str] | None:
+        """Return (code, canonical_name) for a listening mode."""
+        if not label:
+            return None
+        clean_label = label.strip()
+        if not clean_label:
+            return None
+        if clean_label in self._sound_modes:
+            return self._sound_modes[clean_label], clean_label
+        lowered = clean_label.lower()
+        alias_code = self._sound_mode_aliases.get(lowered)
+        if alias_code:
+            canonical = self._sound_mode_code_to_name.get(
+                alias_code, self._name_for_sound_mode_code(alias_code)
+            )
+            return alias_code, canonical
+        return None
+
+    def _name_for_sound_mode_code(self, code: str) -> str:
+        """Return a friendly label for a listening mode code."""
+        clean_code = code.strip()
+        if not clean_code:
+            return clean_code
+        clean_code = clean_code.zfill(4)
+        if clean_code in self._sound_mode_code_to_name:
+            return self._sound_mode_code_to_name[clean_code]
+        fallback = f"Mode {clean_code}"
+        self._sound_mode_code_to_name[clean_code] = fallback
+        if fallback not in self._sound_modes:
+            self._sound_modes[fallback] = clean_code
+        self._sound_mode_aliases[fallback.lower()] = clean_code
+        return fallback
+
+    def _update_sound_mode_from_response(self, response: bytes | None) -> None:
+        """Parse listening mode feedback."""
+        if not response:
+            return
+        try:
+            raw = response.decode().strip()
+        except (UnicodeDecodeError, AttributeError):
+            return
+        digits = "".join(ch for ch in raw if ch.isdigit())
+        if len(digits) < 4:
+            return
+        code = digits[-4:].zfill(4)
+        self._sound_mode_code = code
+        self._sound_mode = self._name_for_sound_mode_code(code)
 
     async def _send_command(self, command: str) -> None:
         """Send a command to the Pioneer AVR."""

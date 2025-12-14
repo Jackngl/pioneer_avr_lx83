@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-12-14
+
+- Added sound-mode support (media_player.select_sound_mode) with listening-mode parsing
+- Registered `pioneer_avr_lx83.send_raw_command` in docs, plus telnet quick-reference tables
+- Expanded Lovelace examples (audio/video grids, mode buttons) and added bilingual instructions
+- Added Pioneer-styled logo/icon assets for HACS + noted third-party license for listening modes
+
 ## [1.0.1] - 2025-12-13
 
 - Improved telnet stability and added versioning workflow

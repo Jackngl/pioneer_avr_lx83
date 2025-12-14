@@ -9,6 +9,8 @@ Control your Pioneer AVR LX83 receiver from Home Assistant via Telnet.
 - Source selection
 - Mute control
 - Real-time status updates
+- Listening mode selection
+- Raw telnet service for advanced dashboards
 
 ## Configuration
 
@@ -17,4 +19,3 @@ Add the integration via the UI:
 2. Click "+ Add Integration"
 3. Search for "Pioneer AVR LX83"
 4. Enter your device details
-

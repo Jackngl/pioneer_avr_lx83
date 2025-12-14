@@ -30,35 +30,113 @@ SUPPORT_PIONEER = (
     | MediaPlayerEntityFeature.SELECT_SOURCE
     | MediaPlayerEntityFeature.PLAY
     | MediaPlayerEntityFeature.PAUSE
+    | MediaPlayerEntityFeature.SELECT_SOUND_MODE
 )
 
 MAX_SOURCE_SLOTS = 60
 
-# Default sources mapping - Mis à jour selon la documentation
+# Default sources mapping - friendly labels shown in HA
 DEFAULT_SOURCES = {
-    "PHONO": "00",
+    "Phono": "00",
     "CD": "01",
-    "TUNER": "02",
-    "CDR/TAPE": "03",
+    "Tuner": "02",
+    "CDR/Tape": "03",
     "DVD": "04",
-    "TV/SAT": "05",
-    "VIDEO 1": "10",
-    "MULTI CH IN": "12",
-    "VIDEO 2": "14",
+    "TV/Sat": "05",
+    "Video 1": "10",
+    "Multi Ch In": "12",
+    "Video 2": "14",
     "DVR/BDR": "15",
     "iPod/USB": "17",
-    "XM RADIO": "18",
+    "XM Radio": "18",
     "HDMI 1": "19",
     "HDMI 2": "20",
     "HDMI 3": "21",
     "HDMI 4": "22",
     "HDMI 5": "23",
-    "BD": "25",
-    "BLU-RAY": "25",
-    "HMG": "26",
-    "HDMI CYCL": "31",
-    "ADAPTER PORT": "33",
-    "BLUETOOTH": "33",
+    "Blu-ray": "25",
+    "Home Media Gallery": "26",
+    "HDMI Cycle": "31",
+    "Bluetooth": "33",
+}
+
+# Case-insensitive aliases to improve dashboard usability
+SOURCE_ALIASES = {
+    "phono": "00",
+    "cd": "01",
+    "tuner": "02",
+    "cdr/tape": "03",
+    "tape": "03",
+    "dvd": "04",
+    "tv": "05",
+    "tv/sat": "05",
+    "sat": "05",
+    "video1": "10",
+    "video 1": "10",
+    "multi ch": "12",
+    "multich": "12",
+    "video2": "14",
+    "video 2": "14",
+    "dvr": "15",
+    "bdr": "15",
+    "ipod": "17",
+    "usb": "17",
+    "xm": "18",
+    "xm radio": "18",
+    "hdmi": "19",
+    "hdmi1": "19",
+    "hdmi2": "20",
+    "hdmi3": "21",
+    "hdmi4": "22",
+    "hdmi5": "23",
+    "bd": "25",
+    "blu-ray": "25",
+    "bluray": "25",
+    "bd/dvd": "25",
+    "hmg": "26",
+    "net": "26",
+    "network": "26",
+    "hdmi cycl": "31",
+    "hdmi cycle": "31",
+    "adapter port": "33",
+    "adapter": "33",
+    "bluetooth": "33",
+}
+
+# Listening modes (adapted from Pioneer IP documentation and aiopioneer project)
+DEFAULT_LISTENING_MODES = {
+    "Auto Surround": "0006",
+    "Direct": "0007",
+    "Pure Direct": "0008",
+    "Stereo": "0001",
+    "Standard": "0010",
+    "Extended Stereo": "0112",
+    "Advanced Game": "0118",
+    "THX Cinema": "0056",
+    "THX Music": "0069",
+    "Optimum Surround": "0152",
+    "Eco Mode": "0200",
+}
+
+LISTENING_MODE_ALIASES = {
+    "auto": "0006",
+    "auto surround": "0006",
+    "direct": "0007",
+    "pure": "0008",
+    "pure direct": "0008",
+    "stereo": "0001",
+    "standard": "0010",
+    "extended": "0112",
+    "extended stereo": "0112",
+    "game": "0118",
+    "advanced game": "0118",
+    "thx": "0056",
+    "thx cinema": "0056",
+    "thx music": "0069",
+    "optimum": "0152",
+    "optimum surround": "0152",
+    "eco": "0200",
+    "eco mode": "0200",
 }
 
 # Commands

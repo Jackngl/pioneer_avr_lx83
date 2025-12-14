@@ -52,6 +52,33 @@ Sources prédéfinies:
 - `31FN` - HDMI CYCL
 - `33FN` - ADAPTER PORT
 
+### Raccourcis rapides pour les tests
+
+| Action | Commande |
+|--------|----------|
+| CD | `01FN` |
+| DVD | `04FN` |
+| TV/SAT | `05FN` |
+| Blu-ray | `25FN` |
+| NET / HMG | `26FN` |
+| HDMI 1 | `19FN` |
+| Bluetooth / Adapter | `33FN` |
+
+### Modes d'écoute courants
+
+| Mode | Commande |
+|------|----------|
+| Auto Surround | `0006SR` |
+| Direct | `0007SR` |
+| Pure Direct | `0008SR` |
+| Stereo | `0001SR` |
+| Extended Stereo | `0112SR` |
+| Advanced Game | `0118SR` |
+| THX Cinema | `0056SR` |
+| THX Music | `0069SR` |
+| Optimum Surround | `0152SR` |
+| Eco Mode | `0200SR` |
+
 ### Mode d'écoute
 - `%04dSR` - Définir le mode d'écoute (où %04d est un nombre à 4 chiffres)
 - `?L` - Interroger le mode d'écoute actuel
