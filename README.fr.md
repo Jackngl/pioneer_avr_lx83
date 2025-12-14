@@ -1545,6 +1545,7 @@ Si quelque chose ne fonctionne pas, consultez les logs :
 - Exécutez `./scripts/bump_version.py 1.1.0` (en adaptant la valeur) pour mettre à jour toutes les références et générer un nouveau bloc dans le changelog.
 - Validez vos changements puis créez un tag `git tag -a v1.1.0 -m "Release v1.1.0"` et poussez-le (`git push --tags`).
 - Un workflow GitHub Actions (`.github/workflows/release.yml`) publie automatiquement une release GitHub dès qu'un tag `v*` est poussé, ce qui permet à HACS d'afficher une version lisible comme `1.1.0`.
+- Un second workflow (`release-drafter.yml`) tient à jour un brouillon de release à chaque push sur `main`, vous n'avez plus qu'à vérifier puis publier une fois le tag créé.
 
 ## Compatibilité
 

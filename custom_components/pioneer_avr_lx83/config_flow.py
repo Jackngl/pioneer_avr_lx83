@@ -1,4 +1,5 @@
 """Config flow for Pioneer AVR LX83 integration."""
+
 from __future__ import annotations
 
 import logging
@@ -82,7 +83,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle the initial step."""
         errors: dict[str, str] = {}
-        
+
         if user_input is not None:
             try:
                 info = await validate_input(self.hass, user_input)
@@ -92,7 +93,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 _LOGGER.exception("Unexpected exception during config flow")
                 errors["base"] = "unknown"
             else:
-                unique_id = f"{user_input[CONF_HOST]}_{user_input.get(CONF_PORT, DEFAULT_PORT)}"
+                unique_id = (
+                    f"{user_input[CONF_HOST]}_{user_input.get(CONF_PORT, DEFAULT_PORT)}"
+                )
                 await self.async_set_unique_id(unique_id)
                 self._abort_if_unique_id_configured()
                 # Add default sources to options
@@ -133,4 +136,3 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
 class CannotConnect(HomeAssistantError):
     """Error to indicate we cannot connect."""
-

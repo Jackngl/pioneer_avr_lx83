@@ -1,4 +1,5 @@
 """The Pioneer AVR LX83 integration."""
+
 from __future__ import annotations
 
 import logging

@@ -1,4 +1,5 @@
 """Constants for the Pioneer AVR LX83 integration."""
+
 from datetime import timedelta
 
 from homeassistant.components.media_player import MediaPlayerEntityFeature

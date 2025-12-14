@@ -1,4 +1,5 @@
 """Support for Pioneer AVR LX83 receivers."""
+
 from __future__ import annotations
 
 import asyncio
@@ -119,9 +120,7 @@ class PioneerAVR(MediaPlayerEntity):
         self._is_muted = False
         self._source = None
         self._sources = dict(DEFAULT_SOURCES)
-        self._source_code_to_name = {
-            code: name for name, code in self._sources.items()
-        }
+        self._source_code_to_name = {code: name for name, code in self._sources.items()}
         self._source_aliases = {
             name.lower(): code for name, code in self._sources.items()
         }
@@ -322,7 +321,9 @@ class PioneerAVR(MediaPlayerEntity):
                 if not self._dynamic_sources_loaded:
                     await self._ensure_dynamic_sources()
                 # Query volume
-                volume_response = await self._send_command_with_response(CMD_VOLUME_QUERY)
+                volume_response = await self._send_command_with_response(
+                    CMD_VOLUME_QUERY
+                )
                 if volume_response:
                     try:
                         vol_str = volume_response.decode().strip()
@@ -344,7 +345,9 @@ class PioneerAVR(MediaPlayerEntity):
                         _LOGGER.debug("Error parsing mute response: %s", err)
 
                 # Query source
-                source_response = await self._send_command_with_response(CMD_SOURCE_QUERY)
+                source_response = await self._send_command_with_response(
+                    CMD_SOURCE_QUERY
+                )
                 if source_response:
                     try:
                         src_str = source_response.decode().strip()
@@ -494,10 +497,13 @@ class PioneerAVR(MediaPlayerEntity):
         """Send a command to the Pioneer AVR."""
         async with self._command_lock:
             try:
-                await self.hass.async_add_executor_job(
-                    self._send_command_sync, command
-                )
-            except (socket.timeout, socket.error, ConnectionRefusedError, OSError) as err:
+                await self.hass.async_add_executor_job(self._send_command_sync, command)
+            except (
+                socket.timeout,
+                socket.error,
+                ConnectionRefusedError,
+                OSError,
+            ) as err:
                 _LOGGER.error("Network error sending command '%s': %s", command, err)
                 self._retry_count += 1
                 if self._retry_count > MAX_RETRIES:
@@ -515,7 +521,12 @@ class PioneerAVR(MediaPlayerEntity):
                 return await self.hass.async_add_executor_job(
                     self._send_command_sync_with_response, command
                 )
-            except (socket.timeout, socket.error, ConnectionRefusedError, OSError) as err:
+            except (
+                socket.timeout,
+                socket.error,
+                ConnectionRefusedError,
+                OSError,
+            ) as err:
                 _LOGGER.error("Network error sending command '%s': %s", command, err)
                 self._retry_count += 1
                 if self._retry_count > MAX_RETRIES:
@@ -537,7 +548,12 @@ class PioneerAVR(MediaPlayerEntity):
                 sock.sendall(payload)
                 time.sleep(COMMAND_PAUSE)
                 return
-            except (socket.timeout, socket.error, ConnectionRefusedError, OSError) as err:
+            except (
+                socket.timeout,
+                socket.error,
+                ConnectionRefusedError,
+                OSError,
+            ) as err:
                 _LOGGER.error(
                     "Error sending command '%s' to %s:%s (attempt %d/%d): %s",
                     command,
@@ -562,7 +578,12 @@ class PioneerAVR(MediaPlayerEntity):
                 sock.sendall(payload)
                 time.sleep(COMMAND_PAUSE)
                 return self._read_response(sock)
-            except (socket.timeout, socket.error, ConnectionRefusedError, OSError) as err:
+            except (
+                socket.timeout,
+                socket.error,
+                ConnectionRefusedError,
+                OSError,
+            ) as err:
                 _LOGGER.error(
                     "Error sending command '%s' with response to %s:%s (attempt %d/%d): %s",
                     command,
@@ -587,7 +608,9 @@ class PioneerAVR(MediaPlayerEntity):
         if self._socket is not None:
             return self._socket
 
-        sock = socket.create_connection((self._host, self._port), timeout=DEFAULT_TIMEOUT)
+        sock = socket.create_connection(
+            (self._host, self._port), timeout=DEFAULT_TIMEOUT
+        )
         sock.settimeout(DEFAULT_TIMEOUT)
         self._socket = sock
         return sock
