@@ -1,0 +1,15 @@
+send_raw_command:
+  name: Send raw Pioneer command
+  description: Send an arbitrary Telnet command (e.g., `01FN`, `0006SR`) to the receiver.
+  target:
+    entity:
+      integration: pioneer_avr_lx83
+      domain: media_player
+  fields:
+    command:
+      name: Command
+      description: Raw Pioneer command without CR (examples `01FN`, `0006SR`, `?F`)
+      required: true
+      example: "01FN"
+      selector:
+        text:
