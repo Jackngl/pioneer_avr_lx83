@@ -66,18 +66,39 @@ Sources prédéfinies:
 
 ### Modes d'écoute courants
 
+#### Modes standards
+
 | Mode | Commande |
 |------|----------|
-| Auto Surround | `0006SR` |
+| Stereo | `0001SR` |
+| Auto Surround / Stream Direct | `0006SR` |
 | Direct | `0007SR` |
 | Pure Direct | `0008SR` |
-| Stereo | `0001SR` |
+| Standard (Dolby/DTS) | `0010SR` |
 | Extended Stereo | `0112SR` |
 | Advanced Game | `0118SR` |
-| THX Cinema | `0056SR` |
-| THX Music | `0069SR` |
 | Optimum Surround | `0152SR` |
 | Eco Mode | `0200SR` |
+
+#### Modes THX
+
+| Mode | Commande |
+|------|----------|
+| THX Cinema | `0101SR` |
+| THX Music | `0102SR` |
+| THX Games | `0103SR` |
+| THX Select2 Cinema / Ultra2 Cinema | `0105SR` |
+| THX Select2 Music / Ultra2 Music | `0106SR` |
+| THX Select2 Games / Ultra2 Games | `0107SR` |
+| THX Surround EX | `0115SR` |
+
+#### Modes Dolby
+
+| Mode | Commande |
+|------|----------|
+| PRO LOGIC II Movie | `0013SR` |
+| PRO LOGIC II Music | `0014SR` |
+| Dolby Surround (Atmos/LX) | `0151SR` |
 
 ### Mode d'écoute
 - `%04dSR` - Définir le mode d'écoute (où %04d est un nombre à 4 chiffres)

@@ -14,7 +14,9 @@ SCAN_INTERVAL = timedelta(seconds=10)
 MAX_RETRIES = 3
 RETRY_DELAY = 1  # seconds
 COMMAND_TERMINATOR = "\r"
-COMMAND_PAUSE = 0.3  # seconds between sequential telnet commands
+# IMPORTANT: Délai entre chaque commande Telnet (100ms recommandé par Pioneer)
+# Ce délai évite de saturer le processeur réseau de l'amplificateur
+COMMAND_PAUSE = 0.1  # 100ms entre les commandes séquentielles
 VOLUME_MAX = 185  # Pioneer absolute volume steps
 VOLUME_DB_OFFSET = 85  # Step offset when AVR front panel shows dB
 
@@ -107,16 +109,28 @@ SOURCE_ALIASES = {
 # Listening modes (adapted from Pioneer IP documentation and aiopioneer project)
 # Note: Some Pioneer models return extended codes (e.g., "0401" for Auto Surround)
 # We map both the standard codes and extended codes to the same mode names
+# IMPORTANT: THX modes use codes starting with 01xx, not 00xx
 DEFAULT_LISTENING_MODES = {
-    "Auto Surround": "0006",
+    "Auto Surround": "0006",  # Auto Surround / Stream Direct
     "Direct": "0007",
     "Pure Direct": "0008",
     "Stereo": "0001",
-    "Standard": "0010",
+    "Standard": "0010",  # Standard (Dolby/DTS)
     "Extended Stereo": "0112",
     "Advanced Game": "0118",
-    "THX Cinema": "0056",
-    "THX Music": "0069",
+    # THX modes
+    "THX Cinema": "0101",
+    "THX Games": "0103",
+    "THX Music": "0102",
+    "THX Select2 Cinema": "0105",  # THX Select2 Cinema / Ultra2 Cinema
+    "THX Select2 Music": "0106",   # THX Select2 Music / Ultra2 Music
+    "THX Select2 Games": "0107",   # THX Select2 Games / Ultra2 Games
+    "THX Surround EX": "0115",
+    # Dolby modes
+    "PRO LOGIC II Movie": "0013",
+    "PRO LOGIC II Music": "0014",
+    "Dolby Surround": "0151",  # Pour les modèles récents Atmos/LX
+    # Autres modes
     "Optimum Surround": "0152",
     "Eco Mode": "0200",
 }
@@ -124,6 +138,7 @@ DEFAULT_LISTENING_MODES = {
 # Mapping des codes étendus retournés par certains modèles Pioneer
 # Format: code_etendu -> code_standard
 # Certains modèles retournent des codes avec format différent (ex: "0208" pour Advanced Game)
+# IMPORTANT: THX modes retournent "LM0101", "LM0102", etc. (pas "LM0056")
 LISTENING_MODE_CODE_MAPPING = {
     "0401": "0006",  # Auto Surround (code étendu)
     "040d": "0006",  # Auto Surround (variante)
@@ -132,10 +147,17 @@ LISTENING_MODE_CODE_MAPPING = {
     "0701": "0008",  # Pure Direct (code étendu)
     "0208": "0118",  # Advanced Game (code étendu)
     "0801": "0118",  # Advanced Game (autre variante)
-    "0506": "0056",  # THX Cinema (code étendu)
-    "0507": "0056",  # THX Cinema (autre variante)
-    "0556": "0056",  # THX Cinema (autre variante)
-    "0560": "0056",  # THX Cinema (autre variante)
+    # THX modes - codes corrects
+    "0101": "0101",  # THX Cinema (code standard)
+    "0102": "0102",  # THX Music (code standard)
+    "0103": "0103",  # THX Games (code standard)
+    "0105": "0105",  # THX Select2 Cinema
+    "0106": "0106",  # THX Select2 Music
+    "0107": "0107",  # THX Select2 Games
+    "0115": "0115",  # THX Surround EX
+    # Anciens codes (pour compatibilité si certains modèles les retournent encore)
+    "0056": "0101",  # Ancien code THX Cinema -> nouveau code
+    "0069": "0102",  # Ancien code THX Music -> nouveau code
     "0608": "0008",  # Pure Direct (autre variante)
     "0708": "0008",  # Pure Direct (autre variante)
 }
@@ -143,18 +165,37 @@ LISTENING_MODE_CODE_MAPPING = {
 LISTENING_MODE_ALIASES = {
     "auto": "0006",
     "auto surround": "0006",
+    "stream direct": "0006",
     "direct": "0007",
     "pure": "0008",
     "pure direct": "0008",
     "stereo": "0001",
     "standard": "0010",
+    "dolby dts": "0010",
     "extended": "0112",
     "extended stereo": "0112",
     "game": "0118",
     "advanced game": "0118",
-    "thx": "0056",
-    "thx cinema": "0056",
-    "thx music": "0069",
+    # THX modes
+    "thx": "0101",
+    "thx cinema": "0101",
+    "thx music": "0102",
+    "thx games": "0103",
+    "thx surround ex": "0115",
+    "thx select2 cinema": "0105",
+    "thx select2 music": "0106",
+    "thx select2 games": "0107",
+    "thx ultra2 cinema": "0105",
+    "thx ultra2 music": "0106",
+    "thx ultra2 games": "0107",
+    # Dolby modes
+    "pro logic": "0013",
+    "pro logic ii": "0013",
+    "pro logic ii movie": "0013",
+    "pro logic ii music": "0014",
+    "dolby surround": "0151",
+    "dolby atmos": "0151",
+    # Autres modes
     "optimum": "0152",
     "optimum surround": "0152",
     "eco": "0200",

@@ -484,8 +484,9 @@ class PioneerAVR(MediaPlayerEntity):
     def _update_sound_mode_from_response(self, response: bytes | None) -> None:
         """Parse listening mode feedback.
         
-        Format de réponse attendu: "LM0001", "LM0006", "LM0401", "LM0208", etc.
+        Format de réponse attendu: "LM0001", "LM0006", "LM0401", "LM0208", "LM0056", etc.
         Certains modèles retournent des codes étendus (ex: "0401" pour Auto Surround, "0208" pour Advanced Game).
+        Pour THX Cinema, certains modèles peuvent retourner "LM56", "LM056", "LM0056", "LM0506", etc.
         Ces codes sont mappés vers les codes standards via LISTENING_MODE_CODE_MAPPING.
         """
         if not response:
@@ -507,23 +508,45 @@ class PioneerAVR(MediaPlayerEntity):
                     # Prendre les 4 premiers chiffres après "LM"
                     code = digits[:4].zfill(4)
                 elif len(digits) > 0:
-                    # Certains modèles retournent moins de 4 chiffres, prendre ce qu'on a
-                    code = digits.zfill(4)
+                    # Certains modèles retournent moins de 4 chiffres (ex: "LM56" pour THX Cinema)
+                    # Essayer de mapper directement le code court
+                    code_short = digits.zfill(4)  # "56" -> "0056"
+                    # Vérifier aussi sans padding pour le mapping
+                    code_raw = digits
+                    # Essayer de mapper le code court d'abord
+                    if code_raw in LISTENING_MODE_CODE_MAPPING:
+                        code = LISTENING_MODE_CODE_MAPPING[code_raw].zfill(4)
+                    elif code_short in LISTENING_MODE_CODE_MAPPING:
+                        code = LISTENING_MODE_CODE_MAPPING[code_short].zfill(4)
+                    else:
+                        code = code_short
         
-        # Fallback: chercher 4 chiffres consécutifs dans la réponse
+        # Fallback: chercher des chiffres dans la réponse
         if not code:
             digits = "".join(ch for ch in raw if ch.isdigit())
             if len(digits) >= 4:
                 code = digits[:4].zfill(4)
             elif len(digits) > 0:
-                code = digits.zfill(4)
+                # Essayer de mapper le code court
+                code_raw = digits
+                if code_raw in LISTENING_MODE_CODE_MAPPING:
+                    code = LISTENING_MODE_CODE_MAPPING[code_raw].zfill(4)
+                else:
+                    code = digits.zfill(4)
         
         if not code:
             _LOGGER.warning("Could not parse listening mode from response: %s", raw)
             return
         
         # Mapper le code étendu vers le code standard si nécessaire
+        # Essayer d'abord avec le code tel quel, puis avec différentes longueurs
         standard_code = LISTENING_MODE_CODE_MAPPING.get(code, code)
+        if standard_code == code:  # Pas de mapping trouvé, essayer avec code court
+            code_short = code.lstrip('0')  # "0056" -> "56"
+            if code_short and code_short != code:
+                standard_code = LISTENING_MODE_CODE_MAPPING.get(code_short, code)
+                if standard_code != code_short:
+                    standard_code = standard_code.zfill(4)
         
         # Utiliser le code standard pour la recherche du nom
         self._sound_mode_code = standard_code

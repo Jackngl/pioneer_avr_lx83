@@ -266,6 +266,11 @@ async def _send_command(self, command: str) -> None:
         # Envoi de la commande...
 ```
 
+**⚠️ Important - Délai entre commandes** :
+- Un délai de **100ms** (`COMMAND_PAUSE = 0.1`) est respecté entre chaque commande Telnet
+- Ce délai est **crucial** pour éviter de saturer le processeur réseau de l'amplificateur
+- Ne pas réduire ce délai sous peine de provoquer des erreurs de communication
+
 ##### Gestion des erreurs
 - **Retry** : Jusqu'à 3 tentatives avec délai de 1 seconde
 - **Fermeture automatique** : Le socket est fermé en cas d'erreur
@@ -339,8 +344,32 @@ def _resolve_source_code(self, label: str) -> tuple[str, str] | None:
 "?F" + "\r"    # Query current source
 "?RGB01" + "\r" # Query source name for code 01
 
-# Listening Mode
-"SR0001" + "\r" # Set Stereo mode
+# Listening Mode - Standard Modes
+"0001SR" + "\r" # Set Stereo mode
+"0006SR" + "\r" # Set Auto Surround / Stream Direct
+"0007SR" + "\r" # Set Direct
+"0008SR" + "\r" # Set Pure Direct
+"0010SR" + "\r" # Set Standard (Dolby/DTS)
+"0112SR" + "\r" # Set Extended Stereo
+"0118SR" + "\r" # Set Advanced Game
+"0152SR" + "\r" # Set Optimum Surround
+"0200SR" + "\r" # Set Eco Mode
+
+# Listening Mode - THX Modes
+"0101SR" + "\r" # Set THX Cinema
+"0102SR" + "\r" # Set THX Music
+"0103SR" + "\r" # Set THX Games
+"0105SR" + "\r" # Set THX Select2 Cinema / Ultra2 Cinema
+"0106SR" + "\r" # Set THX Select2 Music / Ultra2 Music
+"0107SR" + "\r" # Set THX Select2 Games / Ultra2 Games
+"0115SR" + "\r" # Set THX Surround EX
+
+# Listening Mode - Dolby Modes
+"0013SR" + "\r" # Set PRO LOGIC II Movie
+"0014SR" + "\r" # Set PRO LOGIC II Music
+"0151SR" + "\r" # Set Dolby Surround (Atmos/LX models)
+
+# Query
 "?L" + "\r"     # Query listening mode
 ```
 
@@ -380,7 +409,7 @@ def _resolve_source_code(self, label: str) -> tuple[str, str] | None:
 ```
 1. Ouvrir socket (si nécessaire)
 2. Envoyer commande + "\r"
-3. Attendre COMMAND_PAUSE (0.3s)
+3. Attendre COMMAND_PAUSE (100ms) - IMPORTANT pour ne pas saturer l'ampli
 4. Fermer socket (si erreur)
 ```
 
@@ -388,11 +417,16 @@ def _resolve_source_code(self, label: str) -> tuple[str, str] | None:
 ```
 1. Ouvrir socket (si nécessaire)
 2. Envoyer commande + "\r"
-3. Attendre COMMAND_PAUSE (0.3s)
+3. Attendre COMMAND_PAUSE (100ms) - IMPORTANT pour ne pas saturer l'ampli
 4. Lire réponse jusqu'à "\r\n" ou timeout
 5. Parser la réponse
 6. Fermer socket (si erreur)
 ```
+
+**⚠️ Rappel technique important** :
+- **Délai entre commandes** : Un délai de **100ms** (0.1 seconde) est respecté entre chaque commande Telnet
+- **Raison** : Éviter de saturer le processeur réseau de l'amplificateur Pioneer
+- **Conséquence** : Si ce délai est réduit ou supprimé, l'amplificateur peut refuser les commandes ou générer des erreurs
 
 ### Gestion des timeouts
 
@@ -687,6 +721,35 @@ LISTENING_MODE_ALIASES = {
     "newmode": "XXXX",
 }
 ```
+
+### Modes d'écoute disponibles
+
+L'intégration supporte les modes d'écoute suivants :
+
+#### Modes standards
+- **Stereo** (`0001SR`) : Mode stéréo standard
+- **Auto Surround / Stream Direct** (`0006SR`) : Mode surround automatique / Stream Direct
+- **Direct** (`0007SR`) : Mode direct
+- **Pure Direct** (`0008SR`) : Mode direct pur
+- **Standard** (`0010SR`) : Standard (Dolby/DTS)
+- **Extended Stereo** (`0112SR`) : Stéréo étendue
+- **Advanced Game** (`0118SR`) : Mode jeu avancé
+- **Optimum Surround** (`0152SR`) : Surround optimal
+- **Eco Mode** (`0200SR`) : Mode éco
+
+#### Modes THX
+- **THX Cinema** (`0101SR`) : Mode THX Cinema
+- **THX Music** (`0102SR`) : Mode THX Music
+- **THX Games** (`0103SR`) : Mode THX Games
+- **THX Select2 Cinema / Ultra2 Cinema** (`0105SR`) : THX Select2 Cinema / Ultra2 Cinema
+- **THX Select2 Music / Ultra2 Music** (`0106SR`) : THX Select2 Music / Ultra2 Music
+- **THX Select2 Games / Ultra2 Games** (`0107SR`) : THX Select2 Games / Ultra2 Games
+- **THX Surround EX** (`0115SR`) : THX Surround EX
+
+#### Modes Dolby
+- **PRO LOGIC II Movie** (`0013SR`) : Dolby Pro Logic II Movie
+- **PRO LOGIC II Music** (`0014SR`) : Dolby Pro Logic II Music
+- **Dolby Surround** (`0151SR`) : Dolby Surround (pour les modèles récents Atmos/LX)
 
 ### Support des zones
 

@@ -20,6 +20,10 @@ Custom Home Assistant integration for Pioneer AVR LX83 receivers using Telnet pr
 - ✅ Uses DataUpdateCoordinator (HA 2025.12+ compliant)
 - ✅ Automatic source discovery via Pioneer `?RGBxx` responses
 
+### ⚠️ Important Technical Note
+
+**Command Delay**: The integration automatically adds a **100ms delay** between each Telnet command to prevent saturating the amplifier's network processor. This delay is critical for reliable communication and should not be reduced.
+
 ## Installation
 
 ### HACS (Recommended)
@@ -1916,18 +1920,39 @@ Use a Telnet client (`telnet 192.168.1.26 23`) or the `pioneer_avr_lx83.send_raw
 
 The most used listening modes can also be triggered manually:
 
+#### Standard Modes
+
 | Listening Mode | Command |
 |----------------|---------|
-| Auto Surround | `0006SR` |
+| Stereo | `0001SR` |
+| Auto Surround / Stream Direct | `0006SR` |
 | Direct | `0007SR` |
 | Pure Direct | `0008SR` |
-| Stereo | `0001SR` |
+| Standard (Dolby/DTS) | `0010SR` |
 | Extended Stereo | `0112SR` |
 | Advanced Game | `0118SR` |
-| THX Cinema | `0056SR` |
-| THX Music | `0069SR` |
 | Optimum Surround | `0152SR` |
 | Eco Mode | `0200SR` |
+
+#### THX Modes
+
+| Listening Mode | Command |
+|----------------|---------|
+| THX Cinema | `0101SR` |
+| THX Music | `0102SR` |
+| THX Games | `0103SR` |
+| THX Select2 Cinema / Ultra2 Cinema | `0105SR` |
+| THX Select2 Music / Ultra2 Music | `0106SR` |
+| THX Select2 Games / Ultra2 Games | `0107SR` |
+| THX Surround EX | `0115SR` |
+
+#### Dolby Modes
+
+| Listening Mode | Command |
+|----------------|---------|
+| PRO LOGIC II Movie | `0013SR` |
+| PRO LOGIC II Music | `0014SR` |
+| Dolby Surround (Atmos/LX models) | `0151SR` |
 
 > Tip: In dashboards you can call `media_player.select_sound_mode` with the same labels (e.g. `"Auto Surround"`). For one-off troubleshooting or dashboards that need raw commands, call the service `pioneer_avr_lx83.send_raw_command` with `{"entity_id": "media_player.pioneer_avr", "command": "0006SR"}`.
 
