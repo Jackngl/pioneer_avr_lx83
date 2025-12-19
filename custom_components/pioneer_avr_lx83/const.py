@@ -105,6 +105,8 @@ SOURCE_ALIASES = {
 }
 
 # Listening modes (adapted from Pioneer IP documentation and aiopioneer project)
+# Note: Some Pioneer models return extended codes (e.g., "0401" for Auto Surround)
+# We map both the standard codes and extended codes to the same mode names
 DEFAULT_LISTENING_MODES = {
     "Auto Surround": "0006",
     "Direct": "0007",
@@ -117,6 +119,16 @@ DEFAULT_LISTENING_MODES = {
     "THX Music": "0069",
     "Optimum Surround": "0152",
     "Eco Mode": "0200",
+}
+
+# Mapping des codes étendus retournés par certains modèles Pioneer
+# Format: code_etendu -> code_standard
+LISTENING_MODE_CODE_MAPPING = {
+    "0401": "0006",  # Auto Surround (code étendu)
+    "040d": "0006",  # Auto Surround (variante)
+    "0501": "0001",  # Stereo (code étendu)
+    "0601": "0007",  # Direct (code étendu)
+    "0701": "0008",  # Pure Direct (code étendu)
 }
 
 LISTENING_MODE_ALIASES = {

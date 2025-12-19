@@ -51,6 +51,7 @@ from .const import (
     DEFAULT_TIMEOUT,
     DOMAIN,
     LISTENING_MODE_ALIASES,
+    LISTENING_MODE_CODE_MAPPING,
     MAX_SOURCE_SLOTS,
     MAX_RETRIES,
     RETRY_DELAY,
@@ -290,6 +291,8 @@ class PioneerAVR(MediaPlayerEntity):
         self._sound_mode_code = mode_code
         self._sound_mode = canonical_name
         self.async_write_ha_state()
+        # Rafraîchir l'état pour obtenir la réponse réelle de l'amplificateur
+        await self.async_update()
 
     async def async_send_raw_command(self, command: str) -> None:
         """Expose a raw telnet command for advanced cards."""
@@ -479,19 +482,48 @@ class PioneerAVR(MediaPlayerEntity):
         return fallback
 
     def _update_sound_mode_from_response(self, response: bytes | None) -> None:
-        """Parse listening mode feedback."""
+        """Parse listening mode feedback.
+        
+        Format de réponse attendu: "LM0001", "LM0006", "LM0401", etc.
+        Certains modèles retournent des codes étendus (ex: "0401" pour Auto Surround).
+        Ces codes sont mappés vers les codes standards via LISTENING_MODE_CODE_MAPPING.
+        """
         if not response:
             return
         try:
             raw = response.decode().strip()
         except (UnicodeDecodeError, AttributeError):
             return
-        digits = "".join(ch for ch in raw if ch.isdigit())
-        if len(digits) < 4:
+        
+        code = None
+        
+        # Chercher le pattern "LM" suivi de chiffres
+        if "LM" in raw:
+            lm_index = raw.find("LM")
+            if lm_index != -1:
+                after_lm = raw[lm_index + 2:]  # Tout après "LM"
+                digits = "".join(ch for ch in after_lm if ch.isdigit())
+                if len(digits) >= 4:
+                    # Prendre les 4 premiers chiffres après "LM"
+                    code = digits[:4].zfill(4)
+        
+        # Fallback: chercher 4 chiffres consécutifs dans la réponse
+        if not code:
+            digits = "".join(ch for ch in raw if ch.isdigit())
+            if len(digits) >= 4:
+                code = digits[:4].zfill(4)
+        
+        if not code:
             return
-        code = digits[-4:].zfill(4)
-        self._sound_mode_code = code
-        self._sound_mode = self._name_for_sound_mode_code(code)
+        
+        # Mapper le code étendu vers le code standard si nécessaire
+        standard_code = LISTENING_MODE_CODE_MAPPING.get(code, code)
+        
+        # Utiliser le code standard pour la recherche du nom
+        self._sound_mode_code = standard_code
+        self._sound_mode = self._name_for_sound_mode_code(standard_code)
+        _LOGGER.debug("Parsed listening mode: %s -> code: %s (mapped from %s) -> %s", 
+                     raw, standard_code, code, self._sound_mode)
 
     async def _send_command(self, command: str) -> None:
         """Send a command to the Pioneer AVR."""
