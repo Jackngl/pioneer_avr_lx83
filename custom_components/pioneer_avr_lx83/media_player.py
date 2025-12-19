@@ -484,8 +484,8 @@ class PioneerAVR(MediaPlayerEntity):
     def _update_sound_mode_from_response(self, response: bytes | None) -> None:
         """Parse listening mode feedback.
         
-        Format de réponse attendu: "LM0001", "LM0006", "LM0401", etc.
-        Certains modèles retournent des codes étendus (ex: "0401" pour Auto Surround).
+        Format de réponse attendu: "LM0001", "LM0006", "LM0401", "LM0208", etc.
+        Certains modèles retournent des codes étendus (ex: "0401" pour Auto Surround, "0208" pour Advanced Game).
         Ces codes sont mappés vers les codes standards via LISTENING_MODE_CODE_MAPPING.
         """
         if not response:
@@ -506,14 +506,20 @@ class PioneerAVR(MediaPlayerEntity):
                 if len(digits) >= 4:
                     # Prendre les 4 premiers chiffres après "LM"
                     code = digits[:4].zfill(4)
+                elif len(digits) > 0:
+                    # Certains modèles retournent moins de 4 chiffres, prendre ce qu'on a
+                    code = digits.zfill(4)
         
         # Fallback: chercher 4 chiffres consécutifs dans la réponse
         if not code:
             digits = "".join(ch for ch in raw if ch.isdigit())
             if len(digits) >= 4:
                 code = digits[:4].zfill(4)
+            elif len(digits) > 0:
+                code = digits.zfill(4)
         
         if not code:
+            _LOGGER.warning("Could not parse listening mode from response: %s", raw)
             return
         
         # Mapper le code étendu vers le code standard si nécessaire
@@ -522,8 +528,8 @@ class PioneerAVR(MediaPlayerEntity):
         # Utiliser le code standard pour la recherche du nom
         self._sound_mode_code = standard_code
         self._sound_mode = self._name_for_sound_mode_code(standard_code)
-        _LOGGER.debug("Parsed listening mode: %s -> code: %s (mapped from %s) -> %s", 
-                     raw, standard_code, code, self._sound_mode)
+        _LOGGER.debug("Parsed listening mode: %s -> raw code: %s -> standard code: %s -> name: %s", 
+                     raw, code, standard_code, self._sound_mode)
 
     async def _send_command(self, command: str) -> None:
         """Send a command to the Pioneer AVR."""

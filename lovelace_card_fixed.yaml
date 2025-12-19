@@ -939,8 +939,9 @@ cards:
               [[[
                 var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
                 if (!mode) return false;
-                var modeLower = mode.toLowerCase();
-                return modeLower === 'direct' || modeLower.includes('direct');
+                var modeLower = mode.toLowerCase().trim();
+                // Direct doit être exactement "direct" et ne pas contenir "pure"
+                return modeLower === 'direct' && !modeLower.includes('pure');
               ]]]
             styles:
               card:
@@ -975,8 +976,9 @@ cards:
               [[[
                 var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
                 if (!mode) return false;
-                var modeLower = mode.toLowerCase();
-                return modeLower === 'pure direct' || modeLower.includes('pure direct') || (modeLower.includes('pure') && modeLower.includes('direct'));
+                var modeLower = mode.toLowerCase().trim();
+                // Pure Direct doit contenir "pure" ET "direct"
+                return modeLower.includes('pure') && modeLower.includes('direct');
               ]]]
             styles:
               card:
@@ -1011,8 +1013,9 @@ cards:
               [[[
                 var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
                 if (!mode) return false;
-                var modeLower = mode.toLowerCase();
-                return modeLower.includes('thx') && modeLower.includes('cinema');
+                var modeLower = mode.toLowerCase().trim();
+                // THX Cinema doit contenir "thx" ET "cinema" (pas "music")
+                return modeLower.includes('thx') && modeLower.includes('cinema') && !modeLower.includes('music');
               ]]]
             styles:
               card:
@@ -1047,8 +1050,9 @@ cards:
               [[[
                 var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
                 if (!mode) return false;
-                var modeLower = mode.toLowerCase();
-                return modeLower.includes('game') || modeLower.includes('advanced');
+                var modeLower = mode.toLowerCase().trim();
+                // Advanced Game doit contenir "game" ou "advanced game"
+                return modeLower === 'advanced game' || (modeLower.includes('game') && modeLower.includes('advanced'));
               ]]]
             styles:
               card:

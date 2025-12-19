@@ -123,12 +123,19 @@ DEFAULT_LISTENING_MODES = {
 
 # Mapping des codes étendus retournés par certains modèles Pioneer
 # Format: code_etendu -> code_standard
+# Certains modèles retournent des codes avec format différent (ex: "0208" pour Advanced Game)
 LISTENING_MODE_CODE_MAPPING = {
     "0401": "0006",  # Auto Surround (code étendu)
     "040d": "0006",  # Auto Surround (variante)
     "0501": "0001",  # Stereo (code étendu)
     "0601": "0007",  # Direct (code étendu)
     "0701": "0008",  # Pure Direct (code étendu)
+    "0208": "0118",  # Advanced Game (code étendu)
+    "0801": "0118",  # Advanced Game (autre variante)
+    "0506": "0056",  # THX Cinema (code étendu)
+    "0507": "0056",  # THX Cinema (autre variante)
+    "0608": "0008",  # Pure Direct (autre variante)
+    "0708": "0008",  # Pure Direct (autre variante)
 }
 
 LISTENING_MODE_ALIASES = {
