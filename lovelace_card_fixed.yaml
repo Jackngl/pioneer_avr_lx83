@@ -1012,10 +1012,17 @@ cards:
             value: |
               [[[
                 var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
                 if (!mode) return false;
                 var modeLower = mode.toLowerCase().trim();
-                // THX Cinema doit contenir "thx" ET "cinema" (pas "music")
-                return modeLower.includes('thx') && modeLower.includes('cinema') && !modeLower.includes('music');
+                // Vérifier par le nom
+                var hasThx = modeLower.includes('thx');
+                var hasCinema = modeLower.includes('cinema');
+                var hasMusic = modeLower.includes('music');
+                var nameMatch = hasThx && hasCinema && !hasMusic;
+                // Vérifier aussi par le code (0056 = THX Cinema)
+                var codeMatch = modeCode === '0056' || modeCode === '0506' || modeCode === '0507' || modeCode === '0556' || modeCode === '0560';
+                return nameMatch || codeMatch;
               ]]]
             styles:
               card:

@@ -134,6 +134,8 @@ LISTENING_MODE_CODE_MAPPING = {
     "0801": "0118",  # Advanced Game (autre variante)
     "0506": "0056",  # THX Cinema (code étendu)
     "0507": "0056",  # THX Cinema (autre variante)
+    "0556": "0056",  # THX Cinema (autre variante)
+    "0560": "0056",  # THX Cinema (autre variante)
     "0608": "0008",  # Pure Direct (autre variante)
     "0708": "0008",  # Pure Direct (autre variante)
 }
