@@ -159,7 +159,7 @@ STEP_USER_DATA_SCHEMA = {
 - `SCAN_INTERVAL` : `timedelta(seconds=10)`
 - `MAX_RETRIES` : `3`
 - `RETRY_DELAY` : `1` seconde
-- `COMMAND_PAUSE` : `0.3` secondes entre commandes
+- `COMMAND_PAUSE` : `0.1` secondes (100ms) entre commandes - **CRITIQUE** pour éviter de saturer le processeur réseau
 
 #### Volume
 - `VOLUME_MAX` : `185` (pas maximum Pioneer)
@@ -473,7 +473,7 @@ Toutes les 10 secondes (SCAN_INTERVAL):
 4. _send_command_sync() est exécuté dans un thread
 5. _ensure_socket() ouvre/retourne le socket
 6. Commande envoyée via socket.sendall()
-7. Attente COMMAND_PAUSE (0.3s)
+7. Attente COMMAND_PAUSE (100ms) - **IMPORTANT** pour ne pas saturer l'amplificateur
 8. Verrou libéré
 9. État mis à jour localement
 10. async_write_ha_state() notifie Home Assistant
