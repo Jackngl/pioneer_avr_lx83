@@ -1100,9 +1100,12 @@ cards:
             value: |
               [[[
                 var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                if (!mode) return false;
-                var modeLower = mode.toLowerCase().trim();
-                return modeLower === 'standard' || modeLower.includes('standard');
+                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                if (!mode && !modeCode) return false;
+                var modeLower = mode ? mode.toLowerCase().trim() : '';
+                var nameMatch = modeLower === 'standard' || modeLower.includes('standard');
+                var codeMatch = modeCode && String(modeCode).trim() === '0010';
+                return nameMatch || codeMatch;
               ]]]
             styles:
               card:
@@ -1136,9 +1139,12 @@ cards:
             value: |
               [[[
                 var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                if (!mode) return false;
-                var modeLower = mode.toLowerCase().trim();
-                return modeLower.includes('pro logic') && modeLower.includes('movie');
+                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                if (!mode && !modeCode) return false;
+                var modeLower = mode ? mode.toLowerCase().trim() : '';
+                var nameMatch = modeLower.includes('pro logic') && modeLower.includes('movie');
+                var codeMatch = modeCode && String(modeCode).trim() === '0013';
+                return nameMatch || codeMatch;
               ]]]
             styles:
               card:
@@ -1172,9 +1178,12 @@ cards:
             value: |
               [[[
                 var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                if (!mode) return false;
-                var modeLower = mode.toLowerCase().trim();
-                return modeLower.includes('pro logic') && modeLower.includes('music');
+                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                if (!mode && !modeCode) return false;
+                var modeLower = mode ? mode.toLowerCase().trim() : '';
+                var nameMatch = modeLower.includes('pro logic') && modeLower.includes('music');
+                var codeMatch = modeCode && String(modeCode).trim() === '0014';
+                return nameMatch || codeMatch;
               ]]]
             styles:
               card:
@@ -1208,9 +1217,12 @@ cards:
             value: |
               [[[
                 var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                if (!mode) return false;
-                var modeLower = mode.toLowerCase().trim();
-                return modeLower.includes('dolby surround') || (modeLower.includes('dolby') && modeLower.includes('surround'));
+                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                if (!mode && !modeCode) return false;
+                var modeLower = mode ? mode.toLowerCase().trim() : '';
+                var nameMatch = modeLower.includes('dolby surround') || (modeLower.includes('dolby') && modeLower.includes('surround'));
+                var codeMatch = modeCode && String(modeCode).trim() === '0151';
+                return nameMatch || codeMatch;
               ]]]
             styles:
               card:
@@ -1333,8 +1345,10 @@ cards:
                 var hasThx = modeLower.includes('thx');
                 var hasSelect2 = modeLower.includes('select2') || modeLower.includes('ultra2');
                 var hasCinema = modeLower.includes('cinema');
-                var nameMatch = hasThx && hasSelect2 && hasCinema;
-                var codeMatch = modeCode && String(modeCode).trim() === '0105';
+                var hasMusic = modeLower.includes('music');
+                var hasGames = modeLower.includes('games');
+                var nameMatch = hasThx && hasSelect2 && hasCinema && !hasMusic && !hasGames;
+                var codeMatch = modeCode && (String(modeCode).trim() === '0105');
                 return nameMatch || codeMatch;
               ]]]
             styles:
@@ -1375,8 +1389,10 @@ cards:
                 var hasThx = modeLower.includes('thx');
                 var hasSelect2 = modeLower.includes('select2') || modeLower.includes('ultra2');
                 var hasMusic = modeLower.includes('music');
-                var nameMatch = hasThx && hasSelect2 && hasMusic;
-                var codeMatch = modeCode && String(modeCode).trim() === '0106';
+                var hasCinema = modeLower.includes('cinema');
+                var hasGames = modeLower.includes('games');
+                var nameMatch = hasThx && hasSelect2 && hasMusic && !hasCinema && !hasGames;
+                var codeMatch = modeCode && (String(modeCode).trim() === '0106');
                 return nameMatch || codeMatch;
               ]]]
             styles:
@@ -1417,8 +1433,10 @@ cards:
                 var hasThx = modeLower.includes('thx');
                 var hasSelect2 = modeLower.includes('select2') || modeLower.includes('ultra2');
                 var hasGames = modeLower.includes('games');
-                var nameMatch = hasThx && hasSelect2 && hasGames;
-                var codeMatch = modeCode && String(modeCode).trim() === '0107';
+                var hasCinema = modeLower.includes('cinema');
+                var hasMusic = modeLower.includes('music');
+                var nameMatch = hasThx && hasSelect2 && hasGames && !hasCinema && !hasMusic;
+                var codeMatch = modeCode && (String(modeCode).trim() === '0107');
                 return nameMatch || codeMatch;
               ]]]
             styles:
@@ -1457,9 +1475,9 @@ cards:
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var hasThx = modeLower.includes('thx');
-                var hasSurroundEx = modeLower.includes('surround ex') || modeLower.includes('surroundex');
+                var hasSurroundEx = modeLower.includes('surround ex') || modeLower.includes('surroundex') || modeLower.includes('surround ex');
                 var nameMatch = hasThx && hasSurroundEx;
-                var codeMatch = modeCode && String(modeCode).trim() === '0115';
+                var codeMatch = modeCode && (String(modeCode).trim() === '0115');
                 return nameMatch || codeMatch;
               ]]]
             styles:
