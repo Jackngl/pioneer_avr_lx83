@@ -1,0 +1,338 @@
+  - type: custom:mushroom-title-card
+    title: 📺 Sources Vidéo
+  - type: grid
+    columns: 3
+    square: false
+    cards:
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: DVD
+        icon: mdi:disc
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          service_data:
+            entity_id: media_player.pioneer_avr
+            source: DVD
+        state:
+          - operator: template
+            value: |
+              [[[
+                return states['media_player.pioneer_avr'].attributes.source === 'DVD';
+              ]]]
+            styles:
+              card:
+                - background: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)"
+                - box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4)
+                - transform: scale(1.05)
+        styles:
+          card:
+            - background: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+            - border-radius: 20px
+            - transition: all 0.3s ease
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: BD
+        icon: mdi:disc
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          service_data:
+            entity_id: media_player.pioneer_avr
+            source: BD
+        state:
+          - operator: template
+            value: |
+              [[[
+                var source = states['media_player.pioneer_avr'].attributes.source;
+                console.log('Current source:', source);
+                return source === 'BD' || source === 'Blu-ray' || source === 'BluRay';
+              ]]]
+            styles:
+              card:
+                - background: "linear-gradient(135deg, #6366f1 0%, #3b82f6 100%)"
+                - box-shadow: 0 8px 16px rgba(99, 102, 241, 0.4)
+                - transform: scale(1.05)
+        styles:
+          card:
+            - background: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+            - border-radius: 20px
+            - transition: all 0.3s ease
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: TV/Sat
+        icon: mdi:television
+        tap_action:
+          action: call-service
+          service: media_player.select_source
+          service_data:
+            entity_id: media_player.pioneer_avr
+            source: TV/Sat
+        state:
+          - operator: template
+            value: |
+              [[[
+                return states['media_player.pioneer_avr'].attributes.source === 'TV/Sat';
+              ]]]
+            styles:
+              card:
+                - background: "linear-gradient(135deg, #f97316 0%, #dc2626 100%)"
+                - box-shadow: 0 8px 16px rgba(249, 115, 22, 0.4)
+                - transform: scale(1.05)
+        styles:
+          card:
+            - background: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+            - border-radius: 20px
+            - transition: all 0.3s ease
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+  - type: custom:mushroom-title-card
+    title: 🎧 Modes Audio
+  - type: custom:mushroom-title-card
+    title: Modes de base
+    subtitle: Modes audio fondamentaux
+  - type: grid
+    columns: 3
+    square: false
+    cards:
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: Stéréo
+        icon: mdi:speaker-multiple
+        tap_action:
+          action: call-service
+          service: pioneer_avr_lx83.send_raw_command
+          service_data:
+            entity_id: media_player.pioneer_avr
+            command: 0001SR
+        state:
+          - operator: template
+            value: |
+              [[[
+                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                if (!mode) return false;
+                var modeLower = mode.toLowerCase();
+                return modeLower === 'stereo' || modeLower.includes('stereo');
+              ]]]
+            styles:
+              card:
+                - background: "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+                - box-shadow: 0 8px 16px rgba(16, 185, 129, 0.4)
+                - transform: scale(1.05)
+        styles:
+          card:
+            - background: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+            - border-radius: 20px
+            - transition: all 0.3s ease
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: Auto Surround
+        icon: mdi:surround-sound
+        tap_action:
+          action: call-service
+          service: pioneer_avr_lx83.send_raw_command
+          service_data:
+            entity_id: media_player.pioneer_avr
+            command: 0006SR
+        state:
+          - operator: template
+            value: |
+              [[[
+                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                if (!mode) return false;
+                var modeLower = mode.toLowerCase();
+                return modeLower === 'auto surround' || modeLower.includes('auto surround') || modeLower.includes('auto');
+              ]]]
+            styles:
+              card:
+                - background: "linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)"
+                - box-shadow: 0 8px 16px rgba(139, 92, 246, 0.4)
+                - transform: scale(1.05)
+        styles:
+          card:
+            - background: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+            - border-radius: 20px
+            - transition: all 0.3s ease
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 13px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: Direct
+        icon: mdi:volume-high
+        tap_action:
+          action: call-service
+          service: pioneer_avr_lx83.send_raw_command
+          service_data:
+            entity_id: media_player.pioneer_avr
+            command: 0007SR
+        state:
+          - operator: template
+            value: |
+              [[[
+                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                if (!mode) return false;
+                var modeLower = mode.toLowerCase().trim();
+                // Direct doit être exactement "direct" et ne pas contenir "pure"
+                return modeLower === 'direct' && !modeLower.includes('pure');
+              ]]]
+            styles:
+              card:
+                - background: "linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)"
+                - box-shadow: 0 8px 16px rgba(6, 182, 212, 0.4)
+                - transform: scale(1.05)
+        styles:
+          card:
+            - background: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+            - border-radius: 20px
+            - transition: all 0.3s ease
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: Pure Direct
+        icon: mdi:music-circle
+        tap_action:
+          action: call-service
+          service: pioneer_avr_lx83.send_raw_command
+          service_data:
+            entity_id: media_player.pioneer_avr
+            command: 0008SR
+        state:
+          - operator: template
+            value: |
+              [[[
+                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                if (!mode) return false;
+                var modeLower = mode.toLowerCase().trim();
+                // Pure Direct doit contenir "pure" ET "direct"
+                return modeLower.includes('pure') && modeLower.includes('direct');
+              ]]]
+            styles:
+              card:
+                - background: "linear-gradient(135deg, #f59e0b 0%, #f97316 100%)"
+                - box-shadow: 0 8px 16px rgba(245, 158, 11, 0.4)
+                - transform: scale(1.05)
+        styles:
+          card:
+            - background: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+            - border-radius: 20px
+            - transition: all 0.3s ease
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 13px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: Advanced Game
+        icon: mdi:gamepad-variant
+        tap_action:
+          action: call-service
+          service: pioneer_avr_lx83.send_raw_command
+          service_data:
+            entity_id: media_player.pioneer_avr
+            command: 0118SR
+        state:
+          - operator: template
+            value: |
+              [[[
+                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                if (!mode) return false;
+                var modeLower = mode.toLowerCase().trim();
+                // Advanced Game doit contenir "game" ou "advanced game"
+                return modeLower === 'advanced game' || (modeLower.includes('game') && modeLower.includes('advanced'));
+              ]]]
+            styles:
+              card:
+                - background: "linear-gradient(135deg, #ec4899 0%, #db2777 100%)"
+                - box-shadow: 0 8px 16px rgba(236, 72, 153, 0.4)
+                - transform: scale(1.05)
+        styles:
+          card:
+            - background: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+            - border-radius: 20px
+            - transition: all 0.3s ease
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 12px
+          icon:
+            - color: white
+            - width: 32px
+      - type: custom:button-card
+        entity: media_player.pioneer_avr
+        name: Extended Stereo
+        icon: mdi:speaker-wireless
+        tap_action:
+          action: call-service
+          service: pioneer_avr_lx83.send_raw_command
+          service_data:
+            entity_id: media_player.pioneer_avr
+            command: 0112SR
+        state:
+          - operator: template
+            value: |
+              [[[
+                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                if (!mode && !modeCode) return false;
+                var modeLower = mode ? mode.toLowerCase().trim() : '';
+                var nameMatch = modeLower.includes('extended') && modeLower.includes('stereo');
+                var codeMatch = modeCode && String(modeCode).trim() === '0112';
+                return nameMatch || codeMatch;
+              ]]]
+            styles:
+              card:
+                - background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)"
+                - box-shadow: 0 8px 16px rgba(99, 102, 241, 0.4)
+                - transform: scale(1.05)
+        styles:
+          card:
+            - background: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+            - border-radius: 20px
+            - transition: all 0.3s ease
+          name:
+            - color: white
+            - font-weight: bold
+            - font-size: 14px
+          icon:
+            - color: white
+            - width: 32px
