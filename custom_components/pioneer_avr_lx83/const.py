@@ -9,6 +9,7 @@ DOMAIN = "pioneer_avr_lx83"
 DEFAULT_NAME = "Pioneer AVR"
 DEFAULT_PORT = 23
 DEFAULT_TIMEOUT = 10  # seconds instead of 5
+UPDATE_TIMEOUT = 2  # seconds - shorter timeout for update queries to avoid exceeding scan interval
 # Update intervals
 SCAN_INTERVAL = timedelta(seconds=10)
 MAX_RETRIES = 3

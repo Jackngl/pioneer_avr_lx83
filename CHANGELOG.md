@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2025-12-14
+
+### Fixed
+- Fixed "Update took longer than scheduled update interval" warning by optimizing update timeouts
+- Reduced update query timeout from 10s to 2s to prevent exceeding scan interval
+- Added global timeout wrapper to async_update() to ensure it completes within scan interval
+- Optimized dynamic sources discovery to not block updates indefinitely
+
 ## [1.1.0] - 2025-12-14
 
 - Added sound-mode support (media_player.select_sound_mode) with listening-mode parsing

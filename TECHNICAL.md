@@ -155,7 +155,8 @@ STEP_USER_DATA_SCHEMA = {
 #### Configuration
 - `DOMAIN` : `"pioneer_avr_lx83"`
 - `DEFAULT_PORT` : `23`
-- `DEFAULT_TIMEOUT` : `10` secondes
+- `DEFAULT_TIMEOUT` : `10` secondes (pour les commandes normales)
+- `UPDATE_TIMEOUT` : `2` secondes (pour les requêtes de mise à jour, évite de dépasser SCAN_INTERVAL)
 - `SCAN_INTERVAL` : `timedelta(seconds=10)`
 - `MAX_RETRIES` : `3`
 - `RETRY_DELAY` : `1` seconde
@@ -430,8 +431,10 @@ def _resolve_source_code(self, label: str) -> tuple[str, str] | None:
 
 ### Gestion des timeouts
 
-- **Connexion** : 10 secondes
-- **Lecture** : 10 secondes
+- **Connexion** : 10 secondes (DEFAULT_TIMEOUT)
+- **Lecture** : 10 secondes (DEFAULT_TIMEOUT) pour les commandes normales
+- **Mises à jour** : 2 secondes (UPDATE_TIMEOUT) pour éviter de dépasser l'intervalle de scan
+- **Timeout global de mise à jour** : 90% de SCAN_INTERVAL (9 secondes) pour garantir que async_update() se termine avant le prochain cycle
 - **Retry** : 3 tentatives avec délai de 1 seconde
 
 ---
@@ -452,16 +455,20 @@ def _resolve_source_code(self, label: str) -> tuple[str, str] | None:
 
 ```
 Toutes les 10 secondes (SCAN_INTERVAL):
-1. async_update() est appelé
-2. Vérification de l'état power (?P)
+1. async_update() est appelé avec un timeout global de 9 secondes (90% de SCAN_INTERVAL)
+2. Vérification de l'état power (?P) avec UPDATE_TIMEOUT (2s)
 3. Si power = ON:
-   a. Découverte des sources dynamiques (si première fois)
-   b. Interrogation du volume (?V)
-   c. Interrogation du mute (?M)
-   d. Interrogation de la source (?F)
-   e. Interrogation du listening mode (?L)
+   a. Découverte des sources dynamiques (si première fois, timeout de 10s max)
+   b. Interrogation du volume (?V) avec UPDATE_TIMEOUT (2s)
+   c. Interrogation du mute (?M) avec UPDATE_TIMEOUT (2s)
+   d. Interrogation de la source (?F) avec UPDATE_TIMEOUT (2s)
+   e. Interrogation du listening mode (?L) avec UPDATE_TIMEOUT (2s)
 4. Mise à jour de l'état de l'entité
 5. async_write_ha_state()
+
+Note: Toutes les requêtes de mise à jour utilisent UPDATE_TIMEOUT (2s) au lieu de 
+DEFAULT_TIMEOUT (10s) pour éviter de dépasser l'intervalle de scan. Un timeout 
+global garantit que async_update() se termine avant le prochain cycle.
 ```
 
 ### Envoi de commande

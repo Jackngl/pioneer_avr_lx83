@@ -58,6 +58,7 @@ from .const import (
     SOURCE_ALIASES,
     SCAN_INTERVAL,
     SUPPORT_PIONEER,
+    UPDATE_TIMEOUT,
     VOLUME_DB_OFFSET,
     VOLUME_MAX,
 )
@@ -300,76 +301,111 @@ class PioneerAVR(MediaPlayerEntity):
 
     async def async_update(self) -> None:
         """Get the latest details from the device."""
+        # Use a global timeout to prevent exceeding scan interval
+        # Allow up to 90% of scan interval to account for overhead
+        max_update_time = SCAN_INTERVAL.total_seconds() * 0.9
+        
         try:
-            # Query power state
-            power_response = await self._send_command_with_response(CMD_POWER_QUERY)
-            if power_response:
-                # Vérifier les deux formats possibles de réponse
-                self._power_state = (
-                    STATE_ON
-                    if (b"PWR0" in power_response or b"PWR2" in power_response)
-                    else STATE_OFF
-                )
-                if self._power_state == STATE_OFF:
-                    self._playback_state = None
-                self._available = True
-                self._retry_count = 0  # Reset retry count on successful update
-            else:
-                self._retry_count += 1
-                if self._retry_count > MAX_RETRIES:
-                    self._available = False
-                return
-
-            if self._power_state == STATE_ON:
-                if not self._dynamic_sources_loaded:
-                    await self._ensure_dynamic_sources()
-                # Query volume
-                volume_response = await self._send_command_with_response(
-                    CMD_VOLUME_QUERY
-                )
-                if volume_response:
-                    try:
-                        vol_str = volume_response.decode().strip()
-                        # Chercher tous les chiffres après "VOL"
-                        if "VOL" in vol_str:
-                            vol_value = int(vol_str.replace("VOL", ""))
-                            self._volume_step = vol_value
-                            self._volume = self._step_to_level(vol_value)
-                    except (ValueError, AttributeError, UnicodeDecodeError) as err:
-                        _LOGGER.debug("Error parsing volume response: %s", err)
-
-                # Query mute state
-                mute_response = await self._send_command_with_response(CMD_MUTE_QUERY)
-                if mute_response:
-                    try:
-                        mute_str = mute_response.decode().strip()
-                        self._is_muted = "MUT0" in mute_str
-                    except (UnicodeDecodeError, AttributeError) as err:
-                        _LOGGER.debug("Error parsing mute response: %s", err)
-
-                # Query source
-                source_response = await self._send_command_with_response(
-                    CMD_SOURCE_QUERY
-                )
-                if source_response:
-                    try:
-                        src_str = source_response.decode().strip()
-                        if "FN" in src_str:
-                            src_code = src_str.split("FN", 1)[1].strip()
-                            self._source = self._name_for_code(src_code)
-                    except (UnicodeDecodeError, AttributeError) as err:
-                        _LOGGER.debug("Error parsing source response: %s", err)
-
-                mode_response = await self._send_command_with_response(
-                    CMD_LISTENING_MODE_QUERY
-                )
-                self._update_sound_mode_from_response(mode_response)
-
+            await asyncio.wait_for(
+                self._async_update_internal(), timeout=max_update_time
+            )
+        except asyncio.TimeoutError:
+            _LOGGER.warning(
+                "Update took longer than %.1f seconds, aborting to avoid exceeding scan interval",
+                max_update_time,
+            )
+            self._retry_count += 1
+            if self._retry_count > MAX_RETRIES:
+                self._available = False
         except Exception as err:
             _LOGGER.error("Error updating Pioneer AVR: %s", err)
             self._retry_count += 1
             if self._retry_count > MAX_RETRIES:
                 self._available = False
+
+    async def _async_update_internal(self) -> None:
+        """Internal update logic without timeout wrapper."""
+        # Query power state with shorter timeout for updates
+        power_response = await self._send_command_with_response(
+            CMD_POWER_QUERY, UPDATE_TIMEOUT
+        )
+        if power_response:
+            # Vérifier les deux formats possibles de réponse
+            self._power_state = (
+                STATE_ON
+                if (b"PWR0" in power_response or b"PWR2" in power_response)
+                else STATE_OFF
+            )
+            if self._power_state == STATE_OFF:
+                self._playback_state = None
+            self._available = True
+            self._retry_count = 0  # Reset retry count on successful update
+        else:
+            self._retry_count += 1
+            if self._retry_count > MAX_RETRIES:
+                self._available = False
+            return
+
+        if self._power_state == STATE_ON:
+            # Load dynamic sources only once, and don't block updates if it fails
+            if not self._dynamic_sources_loaded:
+                try:
+                    await asyncio.wait_for(
+                        self._ensure_dynamic_sources(), timeout=UPDATE_TIMEOUT * 5
+                    )
+                except asyncio.TimeoutError:
+                    _LOGGER.warning(
+                        "Dynamic sources discovery timed out, continuing with default sources"
+                    )
+                    self._dynamic_sources_loaded = True  # Mark as loaded to avoid retrying
+                except Exception as err:
+                    _LOGGER.debug("Error loading dynamic sources: %s", err)
+                    self._dynamic_sources_loaded = True  # Mark as loaded to avoid retrying
+
+            # Query volume with shorter timeout
+            volume_response = await self._send_command_with_response(
+                CMD_VOLUME_QUERY, UPDATE_TIMEOUT
+            )
+            if volume_response:
+                try:
+                    vol_str = volume_response.decode().strip()
+                    # Chercher tous les chiffres après "VOL"
+                    if "VOL" in vol_str:
+                        vol_value = int(vol_str.replace("VOL", ""))
+                        self._volume_step = vol_value
+                        self._volume = self._step_to_level(vol_value)
+                except (ValueError, AttributeError, UnicodeDecodeError) as err:
+                    _LOGGER.debug("Error parsing volume response: %s", err)
+
+            # Query mute state with shorter timeout
+            mute_response = await self._send_command_with_response(
+                CMD_MUTE_QUERY, UPDATE_TIMEOUT
+            )
+            if mute_response:
+                try:
+                    mute_str = mute_response.decode().strip()
+                    self._is_muted = "MUT0" in mute_str
+                except (UnicodeDecodeError, AttributeError) as err:
+                    _LOGGER.debug("Error parsing mute response: %s", err)
+
+            # Query source with shorter timeout
+            source_response = await self._send_command_with_response(
+                CMD_SOURCE_QUERY, UPDATE_TIMEOUT
+            )
+            if source_response:
+                try:
+                    src_str = source_response.decode().strip()
+                    if "FN" in src_str:
+                        src_code = src_str.split("FN", 1)[1].strip()
+                        self._source = self._name_for_code(src_code)
+                except (UnicodeDecodeError, AttributeError) as err:
+                    _LOGGER.debug("Error parsing source response: %s", err)
+
+            # Query listening mode with shorter timeout
+            mode_response = await self._send_command_with_response(
+                CMD_LISTENING_MODE_QUERY, UPDATE_TIMEOUT
+            )
+            self._update_sound_mode_from_response(mode_response)
 
     async def async_will_remove_from_hass(self) -> None:
         """Close TCP connection when entity is removed."""
@@ -384,8 +420,9 @@ class PioneerAVR(MediaPlayerEntity):
         consecutive_misses = 0
         for idx in range(MAX_SOURCE_SLOTS):
             code = f"{idx:02d}"
+            # Use shorter timeout for source discovery to avoid blocking
             response = await self._send_command_with_response(
-                f"{CMD_SOURCE_NAME_QUERY}{code}"
+                f"{CMD_SOURCE_NAME_QUERY}{code}", UPDATE_TIMEOUT
             )
             if not response:
                 consecutive_misses += 1
@@ -575,12 +612,14 @@ class PioneerAVR(MediaPlayerEntity):
                 if self._retry_count > MAX_RETRIES:
                     self._available = False
 
-    async def _send_command_with_response(self, command: str) -> bytes | None:
+    async def _send_command_with_response(
+        self, command: str, timeout: float | None = None
+    ) -> bytes | None:
         """Send a command and get response."""
         async with self._command_lock:
             try:
                 return await self.hass.async_add_executor_job(
-                    self._send_command_sync_with_response, command
+                    self._send_command_sync_with_response, command, timeout
                 )
             except (
                 socket.timeout,
@@ -630,15 +669,18 @@ class PioneerAVR(MediaPlayerEntity):
                 else:
                     raise
 
-    def _send_command_sync_with_response(self, command: str) -> bytes:
+    def _send_command_sync_with_response(
+        self, command: str, timeout: float | None = None
+    ) -> bytes:
         """Send command and get response synchronously with retry."""
         payload = self._build_payload(command)
+        used_timeout = timeout if timeout is not None else DEFAULT_TIMEOUT
         for attempt in range(1, MAX_RETRIES + 1):
             try:
-                sock = self._ensure_socket()
+                sock = self._ensure_socket(used_timeout)
                 sock.sendall(payload)
                 time.sleep(COMMAND_PAUSE)
-                return self._read_response(sock)
+                return self._read_response(sock, used_timeout)
             except (
                 socket.timeout,
                 socket.error,
@@ -664,15 +706,19 @@ class PioneerAVR(MediaPlayerEntity):
         """Ensure the raw volume step stays within Pioneer limits."""
         return max(0, min(VOLUME_MAX, step))
 
-    def _ensure_socket(self) -> socket.socket:
+    def _ensure_socket(self, timeout: float | None = None) -> socket.socket:
         """Return an active socket connection, opening it if needed."""
+        used_timeout = timeout if timeout is not None else DEFAULT_TIMEOUT
         if self._socket is not None:
+            # Update timeout on existing socket if different
+            if timeout is not None:
+                self._socket.settimeout(used_timeout)
             return self._socket
 
         sock = socket.create_connection(
-            (self._host, self._port), timeout=DEFAULT_TIMEOUT
+            (self._host, self._port), timeout=used_timeout
         )
-        sock.settimeout(DEFAULT_TIMEOUT)
+        sock.settimeout(used_timeout)
         self._socket = sock
         return sock
 
@@ -694,10 +740,11 @@ class PioneerAVR(MediaPlayerEntity):
         """Return the raw bytes to send for a Pioneer telnet command."""
         return (command + COMMAND_TERMINATOR).encode()
 
-    def _read_response(self, sock: socket.socket) -> bytes:
+    def _read_response(self, sock: socket.socket, timeout: float | None = None) -> bytes:
         """Read bytes from the AVR until a terminator or timeout is reached."""
         response = b""
-        deadline = time.monotonic() + DEFAULT_TIMEOUT
+        used_timeout = timeout if timeout is not None else DEFAULT_TIMEOUT
+        deadline = time.monotonic() + used_timeout
         terminator = COMMAND_TERMINATOR.encode()
 
         while time.monotonic() < deadline:
