@@ -1,0 +1,145 @@
+# Code Lovelace pour afficher la fréquence du tuner en MHz
+# À ajouter dans votre configuration Lovelace
+
+# Option 1: Carte simple avec la fréquence du tuner
+# (Affiche uniquement si la source est "Tuner")
+- type: markdown
+  content: |
+    ## 📻 Fréquence du Tuner
+  card_mod:
+    style: |
+      ha-markdown {
+        padding: 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        color: white;
+        font-weight: bold;
+      }
+
+# Option 2: Carte avec template conditionnel (recommandée)
+# Affiche la fréquence uniquement quand la source est "Tuner"
+- type: custom:button-card
+  entity: media_player.pioneer_avr
+  name: Fréquence Tuner
+  icon: mdi:radio
+  show_state: true
+  state:
+    - value: 'off'
+      styles:
+        card:
+          - opacity: 0.5
+    - operator: template
+      value: |
+        [[[
+          return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+        ]]]
+      styles:
+        card:
+          - opacity: 0.5
+          - background: "linear-gradient(135deg, #64748b 0%, #475569 100%)"
+      name: "Tuner non sélectionné"
+  styles:
+    card:
+      - background: "linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)"
+      - border-radius: 16px
+      - padding: 16px
+    name:
+      - color: white
+      - font-weight: bold
+      - font-size: 14px
+    state:
+      - color: white
+      - font-weight: bold
+      - font-size: 24px
+  custom_fields:
+    frequency: |
+      [[[
+        const attrs = states['media_player.pioneer_avr'].attributes;
+        if (attrs.source === 'Tuner' && attrs.tuner_frequency_mhz) {
+          return attrs.tuner_frequency_mhz.toFixed(2) + ' MHz';
+        }
+        return 'N/A';
+      ]]]
+  template: |
+    [[[
+      const attrs = states['media_player.pioneer_avr'].attributes;
+      if (attrs.source === 'Tuner' && attrs.tuner_frequency_mhz) {
+        return attrs.tuner_frequency_mhz.toFixed(2) + ' MHz';
+      }
+      return 'Tuner non actif';
+    ]]]
+
+# Option 3: Carte Entities avec template sensor (plus simple)
+# Nécessite d'ajouter un template sensor dans configuration.yaml
+# (Voir configuration_template.yaml ci-dessous)
+- type: entities
+  title: 📻 Informations Tuner
+  entities:
+    - entity: sensor.pioneer_tuner_frequency
+      name: Fréquence
+      icon: mdi:radio
+      type: custom:template-entity-row
+      state: |
+        [[[
+          const attrs = states['media_player.pioneer_avr'].attributes;
+          if (attrs.source === 'Tuner' && attrs.tuner_frequency_mhz) {
+            return attrs.tuner_frequency_mhz.toFixed(2) + ' MHz';
+          }
+          return 'Non disponible';
+        ]]]
+
+# Option 4: Carte Markdown avec template (simple et élégant)
+- type: markdown
+  content: |
+    ### 📻 Fréquence du Tuner
+    
+    **{{ state_attr('media_player.pioneer_avr', 'tuner_frequency_mhz') | default('N/A', true) }} MHz**
+    
+    *Source: {{ state_attr('media_player.pioneer_avr', 'source') | default('Aucune', true) }}*
+  card_mod:
+    style: |
+      ha-markdown {
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        color: white;
+      }
+      ha-markdown h3 {
+        color: white;
+        margin-top: 0;
+      }
+      ha-markdown strong {
+        font-size: 28px;
+        color: #fbbf24;
+      }
+      ha-markdown em {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+      }
+
+# Option 5: Carte Gauge (visuelle avec jauge)
+- type: gauge
+  entity: media_player.pioneer_avr
+  name: Fréquence Tuner
+  min: 87.5
+  max: 108.0
+  severity:
+    green: 87.5
+    yellow: 95.0
+    red: 108.0
+  unit: MHz
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+      }
+  state: |
+    [[[
+      const attrs = states['media_player.pioneer_avr'].attributes;
+      if (attrs.source === 'Tuner' && attrs.tuner_frequency_mhz) {
+        return attrs.tuner_frequency_mhz;
+      }
+      return null;
+    ]]]
+

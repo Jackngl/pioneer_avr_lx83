@@ -1,0 +1,206 @@
+# ============================================
+# CODE POUR AJOUTER L'AFFICHAGE DE LA FRÉQUENCE DU TUNER
+# Dans votre carte Lovelace existante
+# ============================================
+#
+# Remplacez la section des boutons "Fréquence +" et "Fréquence -" 
+# par ce code qui inclut l'affichage de la fréquence au centre
+#
+# ============================================
+
+# VERSION 1: Horizontal stack avec fréquence au centre (RECOMMANDÉ)
+# Remplacez la section "Fréquence +" et "Fréquence -" dans votre lovelace_card_fixed.yaml
+- type: horizontal-stack
+  cards:
+    # Bouton Fréquence -
+    - type: custom:button-card
+      entity: media_player.pioneer_avr
+      name: Fréquence -
+      icon: mdi:arrow-down
+      tap_action:
+        action: call-service
+        service: pioneer_avr_lx83.send_raw_command
+        service_data:
+          entity_id: media_player.pioneer_avr
+          command: TFD
+      state:
+        - operator: template
+          value: |
+            [[[
+              return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+            ]]]
+          styles:
+            card:
+              - opacity: 1
+        - operator: template
+          value: |
+            [[[
+              return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+            ]]]
+          styles:
+            card:
+              - background: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+              - opacity: 0.5
+              - cursor: not-allowed
+      styles:
+        card:
+          - background: "linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)"
+          - border-radius: 16px
+          - padding: 12px
+        name:
+          - color: white
+          - font-weight: bold
+        icon:
+          - color: white
+          - width: 28px
+    
+    # Carte d'affichage de la fréquence (NOUVEAU)
+    - type: custom:button-card
+      entity: media_player.pioneer_avr
+      name: Fréquence
+      icon: mdi:radio
+      show_state: true
+      state: |
+        [[[
+          const attrs = states['media_player.pioneer_avr'].attributes;
+          if (attrs.source === 'Tuner' && attrs.tuner_frequency_mhz) {
+            return attrs.tuner_frequency_mhz.toFixed(2) + ' MHz';
+          }
+          return 'N/A';
+        ]]]
+      state:
+        - operator: template
+          value: |
+            [[[
+              return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+            ]]]
+          styles:
+            card:
+              - background: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+              - opacity: 0.5
+          name: "Tuner non actif"
+      styles:
+        card:
+          - background: "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+          - border-radius: 16px
+          - padding: 12px
+        name:
+          - color: white
+          - font-weight: bold
+          - font-size: 12px
+        state:
+          - color: white
+          - font-weight: bold
+          - font-size: 20px
+        icon:
+          - color: white
+          - width: 24px
+    
+    # Bouton Fréquence +
+    - type: custom:button-card
+      entity: media_player.pioneer_avr
+      name: Fréquence +
+      icon: mdi:arrow-up
+      tap_action:
+        action: call-service
+        service: pioneer_avr_lx83.send_raw_command
+        service_data:
+          entity_id: media_player.pioneer_avr
+          command: TFI
+      state:
+        - operator: template
+          value: |
+            [[[
+              return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+            ]]]
+          styles:
+            card:
+              - opacity: 1
+        - operator: template
+          value: |
+            [[[
+              return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+            ]]]
+          styles:
+            card:
+              - background: "linear-gradient(135deg, #475569 0%, #334155 100%)"
+              - opacity: 0.5
+              - cursor: not-allowed
+      styles:
+        card:
+          - background: "linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)"
+          - border-radius: 16px
+          - padding: 12px
+        name:
+          - color: white
+          - font-weight: bold
+        icon:
+          - color: white
+          - width: 28px
+
+# ============================================
+# VERSION 2: Carte Markdown simple (alternative)
+# Ajoutez cette carte juste après les boutons de contrôle
+# ============================================
+- type: markdown
+  content: |
+    ### 📻 Fréquence: **{{ state_attr('media_player.pioneer_avr', 'tuner_frequency_mhz') | default('N/A', true) }} MHz**
+  card_mod:
+    style: |
+      ha-markdown {
+        padding: 16px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border-radius: 16px;
+        color: white;
+        text-align: center;
+      }
+      ha-markdown h3 {
+        color: white;
+        margin: 0;
+        font-size: 18px;
+      }
+      ha-markdown strong {
+        font-size: 24px;
+        color: #fbbf24;
+      }
+  state:
+    - operator: template
+      value: |
+        [[[
+          return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+        ]]]
+      styles:
+        card:
+          - opacity: 0.5
+
+# ============================================
+# VERSION 3: Intégration avec Mushroom Card (si vous utilisez Mushroom)
+# ============================================
+- type: custom:mushroom-template-card
+  primary: |
+    [[[
+      const attrs = states['media_player.pioneer_avr'].attributes;
+      if (attrs.source === 'Tuner' && attrs.tuner_frequency_mhz) {
+        return attrs.tuner_frequency_mhz.toFixed(2) + ' MHz';
+      }
+      return 'Fréquence Tuner';
+    ]]]
+  secondary: |
+    [[[
+      const source = states['media_player.pioneer_avr'].attributes.source;
+      return source === 'Tuner' ? 'Tuner actif' : 'Sélectionnez Tuner';
+    ]]]
+  icon: mdi:radio
+  icon_color: |
+    [[[
+      const source = states['media_player.pioneer_avr'].attributes.source;
+      return source === 'Tuner' ? 'green' : 'grey';
+    ]]]
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        border-radius: 20px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      }
+

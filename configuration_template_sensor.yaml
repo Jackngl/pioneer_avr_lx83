@@ -1,0 +1,27 @@
+# Template sensor pour la fréquence du tuner
+# À ajouter dans votre configuration.yaml ou dans un fichier séparé (sensors.yaml)
+# Si vous utilisez un fichier séparé, ajoutez dans configuration.yaml:
+# sensor: !include sensors.yaml
+
+sensor:
+  - platform: template
+    sensors:
+      pioneer_tuner_frequency:
+        friendly_name: "Fréquence Tuner Pioneer"
+        unit_of_measurement: "MHz"
+        value_template: >
+          {% set attrs = state_attr('media_player.pioneer_avr', 'tuner_frequency_mhz') %}
+          {% if attrs is not none %}
+            {{ attrs | float }}
+          {% else %}
+            unknown
+          {% endif %}
+        icon_template: >
+          {% if state_attr('media_player.pioneer_avr', 'source') == 'Tuner' %}
+            mdi:radio
+          {% else %}
+            mdi:radio-off
+          {% endif %}
+        availability_template: >
+          {{ states('media_player.pioneer_avr') != 'unavailable' }}
+

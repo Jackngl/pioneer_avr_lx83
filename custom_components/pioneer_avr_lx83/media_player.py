@@ -38,6 +38,7 @@ from .const import (
     CMD_SOURCE,
     CMD_SOURCE_NAME_QUERY,
     CMD_SOURCE_QUERY,
+    CMD_TUNER_FREQ_QUERY,
     CMD_VOLUME,
     CMD_VOLUME_DOWN,
     CMD_VOLUME_QUERY,
@@ -137,6 +138,7 @@ class PioneerAVR(MediaPlayerEntity):
             name.lower(): code for name, code in self._sound_modes.items()
         }
         self._sound_mode_aliases.update(LISTENING_MODE_ALIASES)
+        self._tuner_frequency: float | None = None  # Frequency in MHz
         self._available = True
         self._retry_count = 0
         self._command_lock = asyncio.Lock()
@@ -200,12 +202,15 @@ class PioneerAVR(MediaPlayerEntity):
     @property
     def extra_state_attributes(self) -> dict[str, float | int | str | list[str]]:
         """Expose raw Pioneer volume step and approximate dB."""
-        return {
+        attrs = {
             "volume_step": self._volume_step,
             "volume_db": self._step_to_db(self._volume_step),
             "sound_mode_code": self._sound_mode_code,
             "available_sound_modes": self.sound_mode_list,
         }
+        if self._tuner_frequency is not None:
+            attrs["tuner_frequency_mhz"] = self._tuner_frequency
+        return attrs
 
     async def async_turn_on(self) -> None:
         """Turn the media player on."""
@@ -406,6 +411,34 @@ class PioneerAVR(MediaPlayerEntity):
                 CMD_LISTENING_MODE_QUERY, UPDATE_TIMEOUT
             )
             self._update_sound_mode_from_response(mode_response)
+
+            # Query tuner frequency if source is Tuner
+            if self._source == "Tuner":
+                freq_response = await self._send_command_with_response(
+                    CMD_TUNER_FREQ_QUERY, UPDATE_TIMEOUT
+                )
+                if freq_response:
+                    try:
+                        freq_str = freq_response.decode().strip()
+                        # Format Pioneer: "FR12345" where 12345 = 123.45 MHz
+                        # 5 digits: first 3 are MHz, last 2 are decimals
+                        if "FR" in freq_str:
+                            freq_raw = freq_str.replace("FR", "").strip()
+                            if freq_raw and freq_raw.isdigit():
+                                # Parse as integer (e.g., 12345) and convert to MHz (123.45)
+                                freq_int = int(freq_raw)
+                                self._tuner_frequency = freq_int / 100.0
+                            else:
+                                self._tuner_frequency = None
+                        else:
+                            self._tuner_frequency = None
+                    except (ValueError, UnicodeDecodeError, AttributeError) as err:
+                        _LOGGER.debug("Error parsing tuner frequency response: %s", err)
+                        self._tuner_frequency = None
+                else:
+                    self._tuner_frequency = None
+            else:
+                self._tuner_frequency = None
 
     async def async_will_remove_from_hass(self) -> None:
         """Close TCP connection when entity is removed."""

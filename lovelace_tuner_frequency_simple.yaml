@@ -1,0 +1,122 @@
+# ============================================
+# CODE LOVELACE SIMPLE POUR AFFICHER LA FRÉQUENCE DU TUNER
+# ============================================
+# 
+# Copiez l'une des options ci-dessous dans votre configuration Lovelace
+# Remplacez 'media_player.pioneer_avr' par le nom de votre entité si différent
+#
+# ============================================
+
+# OPTION 1: Carte Markdown simple (RECOMMANDÉ - le plus simple)
+# Affiche la fréquence en MHz avec un style élégant
+- type: markdown
+  content: |
+    ### 📻 Fréquence Tuner
+    
+    **{{ state_attr('media_player.pioneer_avr', 'tuner_frequency_mhz') | default('N/A', true) }} MHz**
+    
+    *Source: {{ state_attr('media_player.pioneer_avr', 'source') | default('Aucune', true) }}*
+  card_mod:
+    style: |
+      ha-markdown {
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        color: white;
+      }
+      ha-markdown h3 {
+        color: white;
+        margin-top: 0;
+        margin-bottom: 12px;
+      }
+      ha-markdown strong {
+        font-size: 32px;
+        color: #fbbf24;
+        display: block;
+        margin: 8px 0;
+      }
+      ha-markdown em {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+        font-style: normal;
+      }
+
+# OPTION 2: Carte avec template conditionnel (affiche uniquement si Tuner actif)
+# Utilise button-card (nécessite l'addon button-card)
+- type: custom:button-card
+  entity: media_player.pioneer_avr
+  name: Fréquence Tuner
+  icon: mdi:radio
+  show_state: true
+  state: |
+    [[[
+      const attrs = states['media_player.pioneer_avr'].attributes;
+      if (attrs.source === 'Tuner' && attrs.tuner_frequency_mhz) {
+        return attrs.tuner_frequency_mhz.toFixed(2) + ' MHz';
+      }
+      return 'Tuner non actif';
+    ]]]
+  styles:
+    card:
+      - background: "linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)"
+      - border-radius: 16px
+      - padding: 16px
+    name:
+      - color: white
+      - font-weight: bold
+      - font-size: 14px
+    state:
+      - color: white
+      - font-weight: bold
+      - font-size: 24px
+  state:
+    - operator: template
+      value: |
+        [[[
+          return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+        ]]]
+      styles:
+        card:
+          - opacity: 0.5
+          - background: "linear-gradient(135deg, #64748b 0%, #475569 100%)"
+      name: "Tuner non sélectionné"
+
+# OPTION 3: Intégration dans une carte existante (pour ajouter à votre carte actuelle)
+# Ajoutez ceci dans votre vertical-stack ou horizontal-stack existant
+- type: custom:mushroom-template-card
+  primary: |
+    [[[
+      const attrs = states['media_player.pioneer_avr'].attributes;
+      if (attrs.source === 'Tuner' && attrs.tuner_frequency_mhz) {
+        return attrs.tuner_frequency_mhz.toFixed(2) + ' MHz';
+      }
+      return 'Fréquence Tuner';
+    ]]]
+  secondary: |
+    [[[
+      const source = states['media_player.pioneer_avr'].attributes.source;
+      return source === 'Tuner' ? 'Tuner actif' : 'Tuner non sélectionné';
+    ]]]
+  icon: mdi:radio
+  icon_color: |
+    [[[
+      const source = states['media_player.pioneer_avr'].attributes.source;
+      return source === 'Tuner' ? 'purple' : 'grey';
+    ]]]
+  card_mod:
+    style: |
+      ha-card {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        border-radius: 20px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      }
+
+# OPTION 4: Carte Entities (si vous avez créé le template sensor)
+# Nécessite d'ajouter le template sensor dans configuration.yaml (voir configuration_template_sensor.yaml)
+- type: entities
+  title: 📻 Informations Tuner
+  entities:
+    - entity: sensor.pioneer_tuner_frequency
+      name: Fréquence
+      icon: mdi:radio
+
