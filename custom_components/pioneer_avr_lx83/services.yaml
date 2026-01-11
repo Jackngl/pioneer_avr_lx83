@@ -13,3 +13,19 @@ send_raw_command:
       example: "01FN"
       selector:
         text:
+
+process_voice_command:
+  name: Process Voice Command
+  description: Process a voice command for the Pioneer AVR.
+  target:
+    entity:
+      integration: pioneer_avr_lx83
+      domain: media_player
+  fields:
+    command:
+      name: Command
+      description: The voice command to process.
+      required: true
+      example: "Turn on the amplifier"
+      selector:
+        text:

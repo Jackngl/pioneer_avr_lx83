@@ -23,6 +23,23 @@ VOLUME_DB_OFFSET = 85  # Step offset when AVR front panel shows dB
 
 # Configuration
 CONF_SOURCES = "sources"
+CONF_SOUND_MODES = "sound_modes"
+
+# Attributes
+ATTR_COMMAND = "command"
+ATTR_SOURCE_CODE = "source_code"
+ATTR_SOUND_MODE_CODE = "sound_mode_code"
+
+# Services
+SERVICE_SEND_COMMAND = "send_command"
+SERVICE_PROCESS_VOICE_COMMAND = "process_voice_command"
+
+# Alexa
+ALEXA_INTERFACE = "Alexa"
+ALEXA_CAPABILITY_INTERFACE = "Alexa.PowerController"
+ALEXA_CAPABILITY_INTERFACE_VOLUME = "Alexa.Speaker"
+ALEXA_CAPABILITY_INTERFACE_PLAYBACK = "Alexa.PlaybackController"
+ALEXA_CAPABILITY_INTERFACE_INPUT = "Alexa.InputController"
 
 # Features
 SUPPORT_PIONEER = (
