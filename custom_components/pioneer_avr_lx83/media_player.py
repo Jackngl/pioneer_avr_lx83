@@ -9,7 +9,7 @@ import time
 
 import voluptuous as vol
 
-from homeassistant.components.media_player import MediaPlayerEntity
+from homeassistant.components.media_player import MediaPlayerDeviceClass, MediaPlayerEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
@@ -94,6 +94,7 @@ class PioneerAVR(MediaPlayerEntity):
     _attr_has_entity_name = True
     _attr_name = None
     _attr_icon = "mdi:amplifier"
+    _attr_device_class = MediaPlayerDeviceClass.SPEAKER
     _attr_should_poll = True
     _attr_scan_interval = SCAN_INTERVAL
 

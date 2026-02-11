@@ -80,6 +80,14 @@ Une fois configuré, l'intégration crée **une seule entité** sous le domaine 
 
 > Astuce : lorsque l'ampli est allumé, l'intégration interroge automatiquement `?RGBxx` et ajoute les libellés configurés sur l'appareil en plus de la liste ci-dessus.
 
+## Intégration avec Alexa
+
+L'entité Pioneer AVR est exposée à Amazon Alexa **via le support natif media_player de Home Assistant**. Utilisez soit le [skill Alexa Smart Home](https://www.home-assistant.io/integrations/alexa.smart_home/) (avec votre propre Lambda/endpoint), soit [Home Assistant Cloud](https://www.nabucasa.com/) (Nabu Casa) ; aucun « plugin Alexa Pioneer » séparé n'est nécessaire.
+
+- **Exposer l'appareil** : Vérifiez que l'entité est bien incluse pour Alexa. Si vous utilisez un filtre dans la configuration `alexa: smart_home:`, incluez soit le domaine `media_player` (ex. `filter: include_domains: - media_player`), soit votre entité explicitement (ex. `include_entities: - media_player.pioneer_avr` — utilisez votre vrai entity ID).
+- **Personnalisation (optionnel)** : Dans `configuration.yaml`, sous `alexa: smart_home: entity_config:`, vous pouvez définir un **nom** convivial et **display_categories** (ex. `SPEAKER`) pour que l'ampli s'affiche avec le bon libellé et la bonne icône dans l'app Alexa.
+- Après avoir modifié la configuration Alexa ou lancé **Découvrir les appareils** dans l'app Alexa, l'amplificateur apparaît comme **haut-parleur** et peut être contrôlé à la voix (alimentation, volume, muet, source, mode d'écoute, lecture/pause) selon les interfaces supportées par Home Assistant pour les media players.
+
 ## Automatisations
 
 L'intégration Pioneer AVR LX83 peut être utilisée dans des automatisations Home Assistant pour automatiser le contrôle de votre amplificateur.
