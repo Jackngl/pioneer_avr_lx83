@@ -57,22 +57,29 @@ SUPPORT_PIONEER = (
 MAX_SOURCE_SLOTS = 60
 
 # Default sources mapping - friendly labels shown in HA
-# "TV" is included so Alexa InputController exposes it (Alexa only accepts names from
-# its catalog; "TV/Sat" normalizes to "tv/sat" and is not in the catalog).
+# Entries with a comment "Alexa" are alternate names so Alexa InputController exposes
+# them (Alexa only accepts names from its catalog; e.g. "TV/Sat" -> "tv/sat" is rejected).
+# Bluetooth and HDMI Cycle have no Alexa catalog name and cannot be exposed by voice.
 DEFAULT_SOURCES = {
     "Phono": "00",
     "CD": "01",
     "Tuner": "02",
     "CDR/Tape": "03",
+    "Aux 1": "03",  # Alexa
     "DVD": "04",
     "TV/Sat": "05",
-    "TV": "05",
+    "TV": "05",  # Alexa
+    "Satellite": "05",  # Alexa
     "Video 1": "10",
     "Multi Ch In": "12",
+    "Game": "12",  # Alexa (Multi Ch In)
     "Video 2": "14",
     "DVR/BDR": "15",
+    "Input 1": "15",  # Alexa
     "iPod/USB": "17",
+    "iPod": "17",  # Alexa
     "XM Radio": "18",
+    "HD Radio": "18",  # Alexa
     "HDMI 1": "19",
     "HDMI 2": "20",
     "HDMI 3": "21",
@@ -80,6 +87,7 @@ DEFAULT_SOURCES = {
     "HDMI 5": "23",
     "Blu-ray": "25",
     "Home Media Gallery": "26",
+    "Media Player": "26",  # Alexa
     "HDMI Cycle": "31",
     "Bluetooth": "33",
 }
