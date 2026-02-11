@@ -92,6 +92,21 @@ The Pioneer AVR entity is exposed to Amazon Alexa **via Home Assistant’s nativ
 - **Optional customization**: In `configuration.yaml`, under `alexa: smart_home: entity_config:`, you can set a friendly **name** and **display_categories** (e.g. `SPEAKER`) for your amplifier so it appears with the right label and icon in the Alexa app.
 - After changing the Alexa configuration or running **Discover devices** in the Alexa app, the amplifier appears as a **speaker** and can be controlled by voice for power, volume, mute, input source, listening mode, and play/pause, according to the interfaces supported by Home Assistant for media players.
 
+### Renaming the device for Alexa
+
+The name shown in the Alexa app is the "friendly name" sent during discovery. If you do not set anything, Alexa uses the device name from Home Assistant (the one you gave when configuring the Pioneer integration). To display a different name (e.g. "Ampli Salon" or "Living Room Amp"), define it in `entity_config` for your media_player entity:
+
+```yaml
+alexa:
+  smart_home:
+    entity_config:
+      media_player.pioneer_avr:   # use your actual entity_id
+        name: Ampli Salon
+        display_categories: SPEAKER  # or TV
+```
+
+After changing this, restart Home Assistant (or reload the Alexa config if applicable), then in the Alexa app remove the device and run **Discover devices** so the new name and category are applied.
+
 ## Automations
 
 The Pioneer AVR LX83 integration can be used in Home Assistant automations to automate control of your amplifier.

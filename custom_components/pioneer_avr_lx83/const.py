@@ -57,6 +57,8 @@ SUPPORT_PIONEER = (
 MAX_SOURCE_SLOTS = 60
 
 # Default sources mapping - friendly labels shown in HA
+# "TV" is included so Alexa InputController exposes it (Alexa only accepts names from
+# its catalog; "TV/Sat" normalizes to "tv/sat" and is not in the catalog).
 DEFAULT_SOURCES = {
     "Phono": "00",
     "CD": "01",
@@ -64,6 +66,7 @@ DEFAULT_SOURCES = {
     "CDR/Tape": "03",
     "DVD": "04",
     "TV/Sat": "05",
+    "TV": "05",
     "Video 1": "10",
     "Multi Ch In": "12",
     "Video 2": "14",
@@ -96,10 +99,18 @@ SOURCE_ALIASES = {
     "video 1": "10",
     "multi ch": "12",
     "multich": "12",
+
     "video2": "14",
     "video 2": "14",
     "dvr": "15",
     "bdr": "15",
+    "television": "05",
+    "télévision": "05",
+    "télé": "05",
+    "tele": "05",
+    "tv sat": "05",
+    "tv-sat": "05",
+    "sat tv": "05",
     "ipod": "17",
     "usb": "17",
     "xm": "18",

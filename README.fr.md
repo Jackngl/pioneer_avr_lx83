@@ -88,6 +88,49 @@ L'entité Pioneer AVR est exposée à Amazon Alexa **via le support natif media_
 - **Personnalisation (optionnel)** : Dans `configuration.yaml`, sous `alexa: smart_home: entity_config:`, vous pouvez définir un **nom** convivial et **display_categories** (ex. `SPEAKER`) pour que l'ampli s'affiche avec le bon libellé et la bonne icône dans l'app Alexa.
 - Après avoir modifié la configuration Alexa ou lancé **Découvrir les appareils** dans l'app Alexa, l'amplificateur apparaît comme **haut-parleur** et peut être contrôlé à la voix (alimentation, volume, muet, source, mode d'écoute, lecture/pause) selon les interfaces supportées par Home Assistant pour les media players.
 
+### Renommer l'ampli pour Alexa
+
+Le nom affiché dans l'app Alexa est le « friendly name » envoyé lors de la découverte. Sans configuration, Alexa utilise le nom de l'appareil dans Home Assistant (celui donné lors de la configuration de l'intégration Pioneer). Pour afficher un autre nom (ex. « Ampli Salon »), définissez-le dans `entity_config` pour votre entité media_player :
+
+```yaml
+alexa:
+  smart_home:
+    entity_config:
+      media_player.pioneer_avr:   # utilisez votre vrai entity_id
+        name: Ampli
+        display_categories: SPEAKER  # ou TV
+```
+
+Après modification, redémarrez Home Assistant (ou rechargez la config Alexa si possible), puis dans l'app Alexa supprimez l'appareil et lancez **Découvrir les appareils** pour que le nouveau nom et la catégorie soient pris en compte.
+
+### Commandes vocales supportées
+
+Voici les phrases types pour contrôler votre amplificateur avec Alexa (en utilisant le nom "Ampli" par exemple) :
+
+**Alimentation :**
+- "Alexa, allume l'Ampli"
+- "Alexa, éteins l'Ampli"
+
+**Volume :**
+- "Alexa, mets le volume de l'Ampli à 20"
+- "Alexa, augmente le volume de l'Ampli"
+- "Alexa, baisse le volume de l'Ampli"
+- "Alexa, coupe le son de l'Ampli" (Mute)
+- "Alexa, remets le son de l'Ampli" (Unmute)
+
+**Sources (Entrées) :**
+- "Alexa, mets l'Ampli sur TV" (ou "Télé", "Télévision")
+- "Alexa, mets l'Ampli sur DVD"
+- "Alexa, mets l'Ampli sur Bluetooth"
+- "Alexa, mets l'Ampli sur Tuner" (ou "Radio")
+- "Alexa, change l'entrée de l'Ampli sur Blu-ray"
+
+**Modes d'écoute :**
+- "Alexa, règle le mode de l'Ampli sur Stéréo"
+- "Alexa, règle le mode de l'Ampli sur Cinéma" (THX Cinema)
+
+> **Note :** Pour l'entrée TV/Sat, l'intégration reconnait désormais plusieurs variations : "TV", "Télé", "Télévision", "Sat TV" ou "TV Sat".
+
 ## Automatisations
 
 L'intégration Pioneer AVR LX83 peut être utilisée dans des automatisations Home Assistant pour automatiser le contrôle de votre amplificateur.
