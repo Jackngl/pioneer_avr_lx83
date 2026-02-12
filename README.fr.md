@@ -103,33 +103,40 @@ alexa:
 
 Après modification, redémarrez Home Assistant (ou rechargez la config Alexa si possible), puis dans l'app Alexa supprimez l'appareil et lancez **Découvrir les appareils** pour que le nouveau nom et la catégorie soient pris en compte.
 
-### Commandes vocales supportées
+### Exemples vocaux : entrées et modes de son
 
-Voici les phrases types pour contrôler votre amplificateur avec Alexa (en utilisant le nom "Ampli" par exemple) :
+Alexa n’accepte que les noms d’entrée et de mode présents dans son catalogue. Voici ceux qui fonctionnent à la voix (remplacez « Ampli » par le nom de votre appareil).
 
-**Alimentation :**
-- "Alexa, allume l'Ampli"
-- "Alexa, éteins l'Ampli"
+**Entrées (sources) que vous pouvez dire :**
 
-**Volume :**
-- "Alexa, mets le volume de l'Ampli à 20"
-- "Alexa, augmente le volume de l'Ampli"
-- "Alexa, baisse le volume de l'Ampli"
-- "Alexa, coupe le son de l'Ampli" (Mute)
-- "Alexa, remets le son de l'Ampli" (Unmute)
+| Dire à Alexa | Source Pioneer |
+|--------------|----------------|
+| TV, Satellite | TV/Sat |
+| DVD | DVD |
+| CD | CD |
+| Tuner | Tuner (radio) |
+| Aux 1 | CDR/Tape |
+| Video 1, Video 2 | Video 1, Video 2 |
+| HDMI 1 … HDMI 5 | HDMI 1 … 5 |
+| Blu-ray | Blu-ray |
+| iPod | iPod/USB |
+| HD Radio | XM Radio |
+| Media Player | Home Media Gallery (réseau) |
+| Game | Multi Ch In |
+| Input 1 | DVR/BDR |
+| Phono | Phono |
 
-**Sources (Entrées) :**
-- "Alexa, mets l'Ampli sur TV" (ou "Télé", "Télévision")
-- "Alexa, mets l'Ampli sur DVD"
-- "Alexa, mets l'Ampli sur Bluetooth"
-- "Alexa, mets l'Ampli sur Tuner" (ou "Radio")
-- "Alexa, change l'entrée de l'Ampli sur Blu-ray"
+*Non disponibles à la voix* (pas de nom dans le catalogue Alexa) : **Bluetooth**, **HDMI Cycle**. Utilisez l’interface Home Assistant ou des automatisations pour les sélectionner.
 
-**Modes d'écoute :**
-- "Alexa, règle le mode de l'Ampli sur Stéréo"
-- "Alexa, règle le mode de l'Ampli sur Cinéma" (THX Cinema)
+**Modes de son (modes d’écoute) que vous pouvez dire :**
 
-> **Note :** Pour l'entrée TV/Sat, l'intégration reconnait désormais plusieurs variations : "TV", "Télé", "Télévision", "Sat TV" ou "TV Sat".
+Alexa n’expose que ces cinq noms : **Movie**, **Music**, **Night**, **Sport**, **TV**. Exemple : *« Alexa, mets [appareil] sur Movie »*. Ils ne fonctionnent à la voix que si la liste des modes de votre ampli contient un mode avec exactement ce nom (ex. un mode nommé « Movie » ou « Music »). Dans Home Assistant vous pouvez utiliser n’importe quel nom de mode (ex. « THX Cinema », « Stéréo », « Pure Direct ») dans les automatisations ou l’interface.
+
+**Autres commandes vocales (exemples) :**
+
+- *« Alexa, allume l’Ampli »* / *« Alexa, éteins l’Ampli »*
+- *« Alexa, mets le volume de l’Ampli à 20 »* / *« Alexa, augmente le volume »* / *« Alexa, coupe le son »*
+- *« Alexa, mets l’Ampli sur TV »* / *« Alexa, mets l’Ampli sur DVD »* / *« Alexa, mets l’Ampli sur HDMI 1 »*
 
 ## Automatisations
 

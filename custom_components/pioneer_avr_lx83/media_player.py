@@ -124,7 +124,26 @@ class PioneerAVR(MediaPlayerEntity):
         self._is_muted = False
         self._source = None
         self._sources = dict(DEFAULT_SOURCES)
-        self._source_code_to_name = {code: name for name, code in self._sources.items()}
+        # Build code->name mapping, keeping only the FIRST name for each code
+        self._source_code_to_name = {}
+        for name, code in self._sources.items():
+            if code not in self._source_code_to_name:
+                self._source_code_to_name[code] = name
+        # Add Alexa-compatible aliases to sources for discovery
+        alexa_aliases = {
+            "TV": "05",
+            "Satellite": "05",
+            "Aux 1": "03",
+            "Game": "12",
+            "Input 1": "15",
+            "iPod": "17",
+            "HD Radio": "18",
+            "Media Player": "26",
+        }
+        for alias_name, code in alexa_aliases.items():
+            if alias_name not in self._sources:
+                self._sources[alias_name] = code
+        # Build lowercase alias mapping for case-insensitive resolution
         self._source_aliases = {
             name.lower(): code for name, code in self._sources.items()
         }

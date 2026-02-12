@@ -57,29 +57,20 @@ SUPPORT_PIONEER = (
 MAX_SOURCE_SLOTS = 60
 
 # Default sources mapping - friendly labels shown in HA
-# Entries with a comment "Alexa" are alternate names so Alexa InputController exposes
-# them (Alexa only accepts names from its catalog; e.g. "TV/Sat" -> "tv/sat" is rejected).
-# Bluetooth and HDMI Cycle have no Alexa catalog name and cannot be exposed by voice.
+# ONE name per code (the one displayed when the AVR reports that source)
 DEFAULT_SOURCES = {
     "Phono": "00",
     "CD": "01",
     "Tuner": "02",
     "CDR/Tape": "03",
-    "Aux 1": "03",  # Alexa
     "DVD": "04",
     "TV/Sat": "05",
-    "TV": "05",  # Alexa
-    "Satellite": "05",  # Alexa
     "Video 1": "10",
     "Multi Ch In": "12",
-    "Game": "12",  # Alexa (Multi Ch In)
     "Video 2": "14",
     "DVR/BDR": "15",
-    "Input 1": "15",  # Alexa
     "iPod/USB": "17",
-    "iPod": "17",  # Alexa
     "XM Radio": "18",
-    "HD Radio": "18",  # Alexa
     "HDMI 1": "19",
     "HDMI 2": "20",
     "HDMI 3": "21",
@@ -87,31 +78,25 @@ DEFAULT_SOURCES = {
     "HDMI 5": "23",
     "Blu-ray": "25",
     "Home Media Gallery": "26",
-    "Media Player": "26",  # Alexa
     "HDMI Cycle": "31",
     "Bluetooth": "33",
 }
 
 # Case-insensitive aliases to improve dashboard usability
+# Includes Alexa-compatible names (lowercase, no special chars)
 SOURCE_ALIASES = {
     "phono": "00",
     "cd": "01",
     "tuner": "02",
     "cdr/tape": "03",
     "tape": "03",
+    "aux1": "03",  # Alexa name
+    "aux 1": "03",  # Alexa name
     "dvd": "04",
     "tv": "05",
     "tv/sat": "05",
     "sat": "05",
-    "video1": "10",
-    "video 1": "10",
-    "multi ch": "12",
-    "multich": "12",
-
-    "video2": "14",
-    "video 2": "14",
-    "dvr": "15",
-    "bdr": "15",
+    "satellite": "05",  # Alexa name
     "television": "05",
     "télévision": "05",
     "télé": "05",
@@ -119,16 +104,35 @@ SOURCE_ALIASES = {
     "tv sat": "05",
     "tv-sat": "05",
     "sat tv": "05",
+    "video1": "10",
+    "video 1": "10",
+    "video2": "14",
+    "video 2": "14",
+    "multi ch": "12",
+    "multich": "12",
+    "game": "12",  # Alexa name
+    "dvr": "15",
+    "bdr": "15",
+    "input1": "15",  # Alexa name
+    "input 1": "15",  # Alexa name
     "ipod": "17",
     "usb": "17",
+    "ipod/usb": "17",
     "xm": "18",
     "xm radio": "18",
+    "hdradio": "18",  # Alexa name
+    "hd radio": "18",  # Alexa name
     "hdmi": "19",
     "hdmi1": "19",
+    "hdmi 1": "19",
     "hdmi2": "20",
+    "hdmi 2": "20",
     "hdmi3": "21",
+    "hdmi 3": "21",
     "hdmi4": "22",
+    "hdmi 4": "22",
     "hdmi5": "23",
+    "hdmi 5": "23",
     "bd": "25",
     "blu-ray": "25",
     "bluray": "25",
@@ -136,6 +140,8 @@ SOURCE_ALIASES = {
     "hmg": "26",
     "net": "26",
     "network": "26",
+    "mediaplayer": "26",  # Alexa name
+    "media player": "26",  # Alexa name
     "hdmi cycl": "31",
     "hdmi cycle": "31",
     "adapter port": "33",

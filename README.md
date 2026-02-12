@@ -107,6 +107,35 @@ alexa:
 
 After changing this, restart Home Assistant (or reload the Alexa config if applicable), then in the Alexa app remove the device and run **Discover devices** so the new name and category are applied.
 
+### Voice examples: inputs and sound modes
+
+Alexa only accepts input and sound-mode names from its catalog. Below are the names that work by voice (replace "Ampli" with your device name).
+
+**Inputs (sources) you can say:**
+
+| Say to Alexa | Pioneer source |
+|--------------|----------------|
+| TV, Satellite | TV/Sat |
+| DVD | DVD |
+| CD | CD |
+| Tuner | Tuner (radio) |
+| Aux 1 | CDR/Tape |
+| Video 1, Video 2 | Video 1, Video 2 |
+| HDMI 1 … HDMI 5 | HDMI 1 … 5 |
+| Blu-ray, Blu-ray player | Blu-ray |
+| iPod | iPod/USB |
+| HD Radio | XM Radio |
+| Media Player | Home Media Gallery (network) |
+| Game | Multi Ch In |
+| Input 1 | DVR/BDR |
+| Phono | Phono |
+
+*Not available by voice* (no Alexa catalog name): **Bluetooth**, **HDMI Cycle**. Use the Home Assistant UI or automations to select them.
+
+**Sound modes (listening modes) you can say:**
+
+Alexa only exposes these five equalizer names: **Movie**, **Music**, **Night**, **Sport**, **TV**. Example: *"Alexa, set [device] to Movie"*. They work by voice only if your amplifier’s sound mode list includes a mode with that exact name (e.g. a mode named "Movie" or "Music"). In Home Assistant you can use any mode name (e.g. "THX Cinema", "Stereo", "Pure Direct") in automations or the UI.
+
 ## Automations
 
 The Pioneer AVR LX83 integration can be used in Home Assistant automations to automate control of your amplifier.
