@@ -63,12 +63,12 @@ DEFAULT_SOURCES = {
     "Tuner": "02",
     "CDR/Tape": "03",
     "DVD": "04",
-    "TV/Sat": "05",
+    "TV": "05",
     "Video 1": "10",
-    "Multi Ch In": "12",
+    "Multi Ch": "12",
     "Video 2": "14",
     "DVR/BDR": "15",
-    "iPod/USB": "17",
+    "iPod": "17",
     "XM Radio": "18",
     "HDMI 1": "19",
     "HDMI 2": "20",
@@ -92,24 +92,39 @@ SOURCE_ALIASES = {
     "tv": "05",
     "tv/sat": "05",
     "sat": "05",
+    "télé": "05",
+    "télévision": "05",
+    "television": "05",
     "video1": "10",
     "video 1": "10",
     "multi ch": "12",
     "multich": "12",
+    "multi ch in": "12",
     "video2": "14",
     "video 2": "14",
     "dvr": "15",
     "bdr": "15",
     "ipod": "17",
     "usb": "17",
+    "ipod/usb": "17",
     "xm": "18",
     "xm radio": "18",
     "hdmi": "19",
     "hdmi1": "19",
+    "hdmi 1": "19",
+    "hdmi un": "19",
     "hdmi2": "20",
+    "hdmi 2": "20",
+    "hdmi deux": "20",
     "hdmi3": "21",
+    "hdmi 3": "21",
+    "hdmi trois": "21",
     "hdmi4": "22",
+    "hdmi 4": "22",
+    "hdmi quatre": "22",
     "hdmi5": "23",
+    "hdmi 5": "23",
+    "hdmi cinq": "23",
     "bd": "25",
     "blu-ray": "25",
     "bluray": "25",
@@ -122,6 +137,7 @@ SOURCE_ALIASES = {
     "adapter port": "33",
     "adapter": "33",
     "bluetooth": "33",
+    "bt": "33",
 }
 
 # Listening modes (adapted from Pioneer IP documentation and aiopioneer project)
@@ -151,6 +167,7 @@ DEFAULT_LISTENING_MODES = {
     # Autres modes
     "Optimum Surround": "0152",
     "Eco Mode": "0200",
+    "Action": "0201",
 }
 
 # Mapping des codes étendus retournés par certains modèles Pioneer
@@ -164,6 +181,7 @@ LISTENING_MODE_CODE_MAPPING = {
     "0601": "0007",  # Direct (code étendu)
     "0701": "0008",  # Pure Direct (code étendu)
     "0208": "0118",  # Advanced Game (code étendu)
+    "0201": "0201",  # Action (mapping direct pour éviter "Mode 0201")
     "0801": "0118",  # Advanced Game (autre variante)
     # THX modes - codes corrects
     "0101": "0101",  # THX Cinema (code standard)

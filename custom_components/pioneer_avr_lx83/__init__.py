@@ -30,25 +30,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     )
 
-    # Register the entity for Alexa discovery
-    async def async_alexa_discovery(hass, config_entry, alexa_config):
-        """Handle Alexa discovery requests."""
-        from .alexa import PioneerAVRAlexaEntity
-        
-        media_players = hass.data.get("media_player", {}).get(DOMAIN, [])
-        entities = []
-        
-        for media_player in media_players:
-            entities.append(PioneerAVRAlexaEntity(media_player))
-            
-        return entities
-    
-    # Register the discovery function with Home Assistant
-    if "alexa" in hass.config.components:
-        hass.data.setdefault("alexa", {})
-        hass.data["alexa"].setdefault("entities", {})
-        hass.data["alexa"]["entities"][DOMAIN] = async_alexa_discovery
-
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
     return True
 
@@ -57,10 +38,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         hass.data[DOMAIN].pop(entry.entry_id)
-        
-        # Remove from Alexa discovery
-        if "alexa" in hass.config.components and DOMAIN in hass.data.get("alexa", {}).get("entities", {}):
-            hass.data["alexa"]["entities"].pop(DOMAIN)
         
         # Unload services
         await async_unload_services(hass)

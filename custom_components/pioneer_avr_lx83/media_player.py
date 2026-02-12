@@ -9,7 +9,10 @@ import time
 
 import voluptuous as vol
 
-from homeassistant.components.media_player import MediaPlayerEntity
+from homeassistant.components.media_player import (
+    MediaPlayerDeviceClass,
+    MediaPlayerEntity,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
@@ -93,6 +96,7 @@ class PioneerAVR(MediaPlayerEntity):
 
     _attr_has_entity_name = True
     _attr_name = None
+    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
     _attr_icon = "mdi:amplifier"
     _attr_should_poll = True
     _attr_scan_interval = SCAN_INTERVAL
@@ -275,12 +279,14 @@ class PioneerAVR(MediaPlayerEntity):
 
     async def async_select_source(self, source: str) -> None:
         """Select input source."""
+        _LOGGER.debug("Selecting source: %s", source)
         resolved = self._resolve_source_code(source)
         if not resolved:
-            _LOGGER.debug("Unknown source '%s' requested", source)
+            _LOGGER.warning("Unknown source '%s' requested", source)
             return
 
         source_code, canonical_name = resolved
+        _LOGGER.debug("Resolved source '%s' to code '%s' (%s)", source, source_code, canonical_name)
         await self._send_command(f"{source_code}{CMD_SOURCE}")
         self._source = canonical_name
         self.async_write_ha_state()
