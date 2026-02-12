@@ -49,6 +49,7 @@ VOICE_COMMANDS = {
         "mets la télévision",
         "switch to tv",
         "télé",
+        "tv",
         "télévision",
     ],
     "select_source_Satellite": [
@@ -77,6 +78,9 @@ VOICE_COMMANDS = {
     "select_source_HDMI 1": [
         "passe sur hdmi 1",
         "switch to hdmi 1",
+        "hdmi 1",
+        "hdmi one",
+        "hdmi un",
     ],
     "select_source_HDMI 2": [
         "passe sur hdmi 2",
@@ -101,6 +105,7 @@ VOICE_COMMANDS = {
     "select_source_Bluetooth": [
         "passe sur bluetooth",
         "switch to bluetooth",
+        "bluetooth",
     ],
     "select_source_Phono": [
         "passe sur phono",

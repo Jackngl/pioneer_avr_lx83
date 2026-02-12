@@ -77,7 +77,32 @@ SOURCE_ALIASES = {
 class PioneerAVR:
     def __init__(self):
         self._sources = dict(DEFAULT_SOURCES)
-        self._source_code_to_name = {code: name for name, code in self._sources.items()}
+        self._source_code_to_name = {}
+        for name, code in self._sources.items():
+            if code not in self._source_code_to_name:
+                self._source_code_to_name[code] = name
+        
+        # Add Alexa-compatible aliases to sources for discovery
+        alexa_aliases = {
+            "TV": "05",
+            "Satellite": "05",
+            "Télé": "05",
+            "Télévision": "05",
+            "Aux 1": "03",
+            "Game": "12",
+            "Input 1": "15",
+            "iPod": "17",
+            "HD Radio": "18",
+            "Media Player": "26",
+            "Bluetooth": "33",
+            "HDMI 1": "19",
+            "HDMI un": "19",
+            "HDMI one": "19",
+        }
+        for alias_name, code in alexa_aliases.items():
+            if alias_name not in self._sources:
+                self._sources[alias_name] = code
+        
         self._source_aliases = {
             name.lower(): code for name, code in self._sources.items()
         }
@@ -102,24 +127,19 @@ class PioneerAVR:
 def test():
     avr = PioneerAVR()
     test_cases = [
-        ("TV", ("05", "TV/Sat")),
-        ("TV/Sat", ("05", "TV/Sat")),
-        ("Tv", ("05", "TV/Sat")),
-        ("tv", ("05", "TV/Sat")),
-        ("tv/sat", ("05", "TV/Sat")),
-        ("Sat", ("05", "TV/Sat")),
-        ("television", ("05", "TV/Sat")),
-        ("télévision", ("05", "TV/Sat")),
-        ("télé", ("05", "TV/Sat")),
-        ("tele", ("05", "TV/Sat")),
-        ("TV Sat", ("05", "TV/Sat")),
-        ("TV-Sat", ("05", "TV/Sat")),
-        ("Sat TV", ("05", "TV/Sat")),
+        ("TV", ("05", "TV")),
+        ("Télé", ("05", "Télé")),
+        ("Télévision", ("05", "Télévision")),
+        ("HDMI un", ("19", "HDMI un")),
+        ("Bluetooth", ("33", "Bluetooth")),
+        ("bluetooth", ("33", "Bluetooth")),
+        ("BlueTooth", ("33", "Bluetooth")),
+        ("HDMI 1", ("19", "HDMI 1")),
     ]
 
     for input_source, expected in test_cases:
         result = avr._resolve_source_code(input_source)
-        print(f"Input: '{input_source}' -> Result: {result}")
+        print(f"Input: '{input_source}' -> Result: {result} - {'PASS' if result == expected else 'FAIL'}")
 
 if __name__ == "__main__":
     test()

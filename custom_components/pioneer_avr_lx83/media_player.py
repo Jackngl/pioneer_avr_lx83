@@ -133,12 +133,18 @@ class PioneerAVR(MediaPlayerEntity):
         alexa_aliases = {
             "TV": "05",
             "Satellite": "05",
+            "Télé": "05",
+            "Télévision": "05",
             "Aux 1": "03",
             "Game": "12",
             "Input 1": "15",
             "iPod": "17",
             "HD Radio": "18",
             "Media Player": "26",
+            "Bluetooth": "33",
+            "HDMI 1": "19",
+            "HDMI un": "19",
+            "HDMI one": "19",
         }
         for alias_name, code in alexa_aliases.items():
             if alias_name not in self._sources:
