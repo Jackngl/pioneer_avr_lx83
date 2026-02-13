@@ -96,7 +96,7 @@ class PioneerAVR(MediaPlayerEntity):
 
     _attr_has_entity_name = True
     _attr_name = None
-    _attr_device_class = MediaPlayerDeviceClass.SPEAKER
+    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
     _attr_icon = "mdi:amplifier"
     _attr_should_poll = True
     _attr_scan_interval = SCAN_INTERVAL
@@ -147,6 +147,11 @@ class PioneerAVR(MediaPlayerEntity):
         self._command_lock = asyncio.Lock()
         self._socket: socket.socket | None = None
         self._dynamic_sources_loaded = False
+
+    @property
+    def name(self) -> str:
+        """Return the name of the device."""
+        return self._attr_device_info["name"]
 
     @property
     def state(self) -> str:

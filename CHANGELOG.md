@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.4] - 2026-02-13
+
+- Rétablissement de la device_class 'receiver' pour corriger la détection Alexa\n- Restauration de la propriété 'name' pour une meilleure compatibilité
+
 ## [1.2.2] - 2026-02-13
 
 - Suppression du nom redondant 'Pioneer AVR Pioneer AVR' sur Alexa\n- Optimisation de la gestion du nom de l'entité via has_entity_name
