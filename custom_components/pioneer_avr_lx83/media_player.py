@@ -489,10 +489,20 @@ class PioneerAVR(MediaPlayerEntity):
         clean_code = code.strip()
         if not clean_name or not clean_code:
             return
-        if clean_name not in self._sources:
+            
+        # Check if name already exists (case-insensitive)
+        name_exists = False
+        lowered_name = clean_name.lower()
+        for existing_name in self._sources:
+            if existing_name.lower() == lowered_name:
+                name_exists = True
+                break
+                
+        if not name_exists:
             self._sources[clean_name] = clean_code
+            
         self._source_code_to_name.setdefault(clean_code, clean_name)
-        self._source_aliases[clean_name.lower()] = clean_code
+        self._source_aliases[lowered_name] = clean_code
 
     def _resolve_source_code(self, label: str) -> tuple[str, str] | None:
         """Return (code, canonical_name) for a source label, case-insensitively."""

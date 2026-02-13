@@ -1,4 +1,4 @@
-type: vertical-stack
+ttype: vertical-stack
 cards:
   - type: custom:mushroom-title-card
     title: Pioneer AVR
@@ -6,7 +6,7 @@ cards:
   - type: horizontal-stack
     cards:
       - type: custom:mushroom-entity-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Alimentation
         icon: mdi:power
         tap_action:
@@ -21,12 +21,13 @@ cards:
               box-shadow: 0 8px 16px rgba(0,0,0,0.3);
             }
       - type: custom:mushroom-template-card
-        primary: "{{ states('media_player.pioneer_avr') | title }}"
+        primary: "{{ states('media_player.ampli') | title }}"
         secondary: >-
-          {{ state_attr('media_player.pioneer_avr', 'source') | default('Aucune source') }}
+          {{ state_attr('media_player.ampli', 'source') | default('Aucune
+          source') }}
         icon: mdi:speaker
         icon_color: |
-          {% if is_state('media_player.pioneer_avr', 'on') %}
+          {% if is_state('media_player.ampli', 'on') %}
             green
           {% else %}
             red
@@ -39,7 +40,7 @@ cards:
               box-shadow: 0 8px 16px rgba(0,0,0,0.3);
             }
   - type: custom:mushroom-media-player-card
-    entity: media_player.pioneer_avr
+    entity: media_player.ampli
     use_media_info: false
     use_media_artwork: false
     show_volume_level: true
@@ -62,20 +63,20 @@ cards:
     square: false
     cards:
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: CD
         icon: mdi:disc-player
         tap_action:
           action: call-service
           service: media_player.select_source
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             source: CD
         state:
           - operator: template
             value: |
               [[[
-                return states['media_player.pioneer_avr'].attributes.source === 'CD';
+                return states['media_player.ampli'].attributes.source === 'CD';
               ]]]
             styles:
               card:
@@ -95,20 +96,20 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Tuner
         icon: mdi:radio
         tap_action:
           action: call-service
           service: media_player.select_source
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             source: Tuner
         state:
           - operator: template
             value: |
               [[[
-                return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                return states['media_player.ampli'].attributes.source === 'Tuner';
               ]]]
             styles:
               card:
@@ -128,20 +129,20 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Phono
         icon: mdi:album
         tap_action:
           action: call-service
           service: media_player.select_source
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             source: Phono
         state:
           - operator: template
             value: |
               [[[
-                return states['media_player.pioneer_avr'].attributes.source === 'Phono';
+                return states['media_player.ampli'].attributes.source === 'Phono';
               ]]]
             styles:
               card:
@@ -161,20 +162,20 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: iPod/USB
         icon: mdi:usb
         tap_action:
           action: call-service
           service: media_player.select_source
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             source: iPod/USB
         state:
           - operator: template
             value: |
               [[[
-                return states['media_player.pioneer_avr'].attributes.source === 'iPod/USB';
+                return states['media_player.ampli'].attributes.source === 'iPod/USB';
               ]]]
             styles:
               card:
@@ -194,20 +195,20 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Bluetooth
         icon: mdi:bluetooth
         tap_action:
           action: call-service
           service: media_player.select_source
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             source: Bluetooth
         state:
           - operator: template
             value: |
               [[[
-                return states['media_player.pioneer_avr'].attributes.source === 'Bluetooth';
+                return states['media_player.ampli'].attributes.source === 'Bluetooth';
               ]]]
             styles:
               card:
@@ -225,33 +226,31 @@ cards:
             - font-size: 14px
           icon:
             - color: white
-            - width: 32px  - type: vertical-stack
+            - width: 32px
+  - type: vertical-stack
     cards:
       - type: custom:mushroom-title-card
         title: 📻 Stations FM
-        subtitle: >
-          ⚠️ IMPORTANT: La source doit être sur TUNER pour utiliser les presets
-          (01TP-08TP),  la navigation (TPD/TPI) et les fréquences (TFI/TFD).
-          Sinon erreur E04.
+        subtitle: ""
       - type: grid
         columns: 4
         square: false
         cards:
           - type: custom:button-card
-            entity: media_player.pioneer_avr
+            entity: media_player.ampli
             name: Preset 1
             icon: mdi:numeric-1-circle
             tap_action:
               action: call-service
               service: pioneer_avr_lx83.send_raw_command
               service_data:
-                entity_id: media_player.pioneer_avr
+                entity_id: media_player.ampli
                 command: 01TP
             state:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                    return states['media_player.ampli'].attributes.source === 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -260,7 +259,7 @@ cards:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+                    return states['media_player.ampli'].attributes.source !== 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -280,20 +279,20 @@ cards:
                 - color: white
                 - width: 28px
           - type: custom:button-card
-            entity: media_player.pioneer_avr
+            entity: media_player.ampli
             name: Preset 2
             icon: mdi:numeric-2-circle
             tap_action:
               action: call-service
               service: pioneer_avr_lx83.send_raw_command
               service_data:
-                entity_id: media_player.pioneer_avr
+                entity_id: media_player.ampli
                 command: 02TP
             state:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                    return states['media_player.ampli'].attributes.source === 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -302,7 +301,7 @@ cards:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+                    return states['media_player.ampli'].attributes.source !== 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -322,20 +321,20 @@ cards:
                 - color: white
                 - width: 28px
           - type: custom:button-card
-            entity: media_player.pioneer_avr
+            entity: media_player.ampli
             name: Preset 3
             icon: mdi:numeric-3-circle
             tap_action:
               action: call-service
               service: pioneer_avr_lx83.send_raw_command
               service_data:
-                entity_id: media_player.pioneer_avr
+                entity_id: media_player.ampli
                 command: 03TP
             state:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                    return states['media_player.ampli'].attributes.source === 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -343,7 +342,7 @@ cards:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+                    return states['media_player.ampli'].attributes.source !== 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -364,20 +363,20 @@ cards:
                 - color: white
                 - width: 28px
           - type: custom:button-card
-            entity: media_player.pioneer_avr
+            entity: media_player.ampli
             name: Preset 4
             icon: mdi:numeric-4-circle
             tap_action:
               action: call-service
               service: pioneer_avr_lx83.send_raw_command
               service_data:
-                entity_id: media_player.pioneer_avr
+                entity_id: media_player.ampli
                 command: 04TP
             state:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                    return states['media_player.ampli'].attributes.source === 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -385,7 +384,7 @@ cards:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+                    return states['media_player.ampli'].attributes.source !== 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -406,20 +405,20 @@ cards:
                 - color: white
                 - width: 28px
           - type: custom:button-card
-            entity: media_player.pioneer_avr
+            entity: media_player.ampli
             name: Preset 5
             icon: mdi:numeric-5-circle
             tap_action:
               action: call-service
               service: pioneer_avr_lx83.send_raw_command
               service_data:
-                entity_id: media_player.pioneer_avr
+                entity_id: media_player.ampli
                 command: 05TP
             state:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                    return states['media_player.ampli'].attributes.source === 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -427,7 +426,7 @@ cards:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+                    return states['media_player.ampli'].attributes.source !== 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -448,20 +447,20 @@ cards:
                 - color: white
                 - width: 28px
           - type: custom:button-card
-            entity: media_player.pioneer_avr
+            entity: media_player.ampli
             name: Preset 6
             icon: mdi:numeric-6-circle
             tap_action:
               action: call-service
               service: pioneer_avr_lx83.send_raw_command
               service_data:
-                entity_id: media_player.pioneer_avr
+                entity_id: media_player.ampli
                 command: 06TP
             state:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                    return states['media_player.ampli'].attributes.source === 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -469,7 +468,7 @@ cards:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+                    return states['media_player.ampli'].attributes.source !== 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -490,20 +489,20 @@ cards:
                 - color: white
                 - width: 28px
           - type: custom:button-card
-            entity: media_player.pioneer_avr
+            entity: media_player.ampli
             name: Preset 7
             icon: mdi:numeric-7-circle
             tap_action:
               action: call-service
               service: pioneer_avr_lx83.send_raw_command
               service_data:
-                entity_id: media_player.pioneer_avr
+                entity_id: media_player.ampli
                 command: 07TP
             state:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                    return states['media_player.ampli'].attributes.source === 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -511,7 +510,7 @@ cards:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+                    return states['media_player.ampli'].attributes.source !== 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -532,20 +531,20 @@ cards:
                 - color: white
                 - width: 28px
           - type: custom:button-card
-            entity: media_player.pioneer_avr
+            entity: media_player.ampli
             name: Preset 8
             icon: mdi:numeric-8-circle
             tap_action:
               action: call-service
               service: pioneer_avr_lx83.send_raw_command
               service_data:
-                entity_id: media_player.pioneer_avr
+                entity_id: media_player.ampli
                 command: 08TP
             state:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                    return states['media_player.ampli'].attributes.source === 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -553,7 +552,7 @@ cards:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+                    return states['media_player.ampli'].attributes.source !== 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -576,20 +575,20 @@ cards:
       - type: horizontal-stack
         cards:
           - type: custom:button-card
-            entity: media_player.pioneer_avr
+            entity: media_player.ampli
             name: ◀ Précédent
             icon: mdi:skip-previous
             tap_action:
               action: call-service
               service: pioneer_avr_lx83.send_raw_command
               service_data:
-                entity_id: media_player.pioneer_avr
+                entity_id: media_player.ampli
                 command: TPD
             state:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                    return states['media_player.ampli'].attributes.source === 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -597,7 +596,7 @@ cards:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+                    return states['media_player.ampli'].attributes.source !== 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -616,20 +615,20 @@ cards:
                 - color: white
                 - width: 28px
           - type: custom:button-card
-            entity: media_player.pioneer_avr
+            entity: media_player.ampli
             name: Suivant ▶
             icon: mdi:skip-next
             tap_action:
               action: call-service
               service: pioneer_avr_lx83.send_raw_command
               service_data:
-                entity_id: media_player.pioneer_avr
+                entity_id: media_player.ampli
                 command: TPI
             state:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                    return states['media_player.ampli'].attributes.source === 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -637,7 +636,7 @@ cards:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+                    return states['media_player.ampli'].attributes.source !== 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -658,20 +657,20 @@ cards:
       - type: horizontal-stack
         cards:
           - type: custom:button-card
-            entity: media_player.pioneer_avr
+            entity: media_player.ampli
             name: Fréquence +
             icon: mdi:arrow-up
             tap_action:
               action: call-service
               service: pioneer_avr_lx83.send_raw_command
               service_data:
-                entity_id: media_player.pioneer_avr
+                entity_id: media_player.ampli
                 command: TFI
             state:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                    return states['media_player.ampli'].attributes.source === 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -679,7 +678,7 @@ cards:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+                    return states['media_player.ampli'].attributes.source !== 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -698,20 +697,20 @@ cards:
                 - color: white
                 - width: 28px
           - type: custom:button-card
-            entity: media_player.pioneer_avr
+            entity: media_player.ampli
             name: Fréquence -
             icon: mdi:arrow-down
             tap_action:
               action: call-service
               service: pioneer_avr_lx83.send_raw_command
               service_data:
-                entity_id: media_player.pioneer_avr
+                entity_id: media_player.ampli
                 command: TFD
             state:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source === 'Tuner';
+                    return states['media_player.ampli'].attributes.source === 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -719,7 +718,7 @@ cards:
               - operator: template
                 value: |
                   [[[
-                    return states['media_player.pioneer_avr'].attributes.source !== 'Tuner';
+                    return states['media_player.ampli'].attributes.source !== 'Tuner';
                   ]]]
                 styles:
                   card:
@@ -744,20 +743,20 @@ cards:
     square: false
     cards:
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: DVD
         icon: mdi:disc
         tap_action:
           action: call-service
           service: media_player.select_source
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             source: DVD
         state:
           - operator: template
             value: |
               [[[
-                return states['media_player.pioneer_avr'].attributes.source === 'DVD';
+                return states['media_player.ampli'].attributes.source === 'DVD';
               ]]]
             styles:
               card:
@@ -777,20 +776,20 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: BD
         icon: mdi:disc
         tap_action:
           action: call-service
           service: media_player.select_source
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             source: BD
         state:
           - operator: template
             value: |
               [[[
-                var source = states['media_player.pioneer_avr'].attributes.source;
+                var source = states['media_player.ampli'].attributes.source;
                 console.log('Current source:', source);
                 return source === 'BD' || source === 'Blu-ray' || source === 'BluRay';
               ]]]
@@ -812,20 +811,20 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: TV/Sat
         icon: mdi:television
         tap_action:
           action: call-service
           service: media_player.select_source
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             source: TV/Sat
         state:
           - operator: template
             value: |
               [[[
-                return states['media_player.pioneer_avr'].attributes.source === 'TV/Sat';
+                return states['media_player.ampli'].attributes.source === 'TV/Sat';
               ]]]
             styles:
               card:
@@ -843,7 +842,8 @@ cards:
             - font-size: 14px
           icon:
             - color: white
-            - width: 32px  - type: custom:mushroom-title-card
+            - width: 32px
+  - type: custom:mushroom-title-card
     title: 🎧 Modes Audio
   - type: custom:mushroom-title-card
     title: Modes de base
@@ -853,20 +853,20 @@ cards:
     square: false
     cards:
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Stéréo
         icon: mdi:speaker-multiple
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0001SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
                 if (!mode) return false;
                 var modeLower = mode.toLowerCase();
                 return modeLower === 'stereo' || modeLower.includes('stereo');
@@ -889,20 +889,20 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Auto Surround
         icon: mdi:surround-sound
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0006SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
                 if (!mode) return false;
                 var modeLower = mode.toLowerCase();
                 return modeLower === 'auto surround' || modeLower.includes('auto surround') || modeLower.includes('auto');
@@ -925,20 +925,20 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Direct
         icon: mdi:volume-high
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0007SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
                 if (!mode) return false;
                 var modeLower = mode.toLowerCase().trim();
                 // Direct doit être exactement "direct" et ne pas contenir "pure"
@@ -962,20 +962,20 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Pure Direct
         icon: mdi:music-circle
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0008SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
                 if (!mode) return false;
                 var modeLower = mode.toLowerCase().trim();
                 // Pure Direct doit contenir "pure" ET "direct"
@@ -999,20 +999,20 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Advanced Game
         icon: mdi:gamepad-variant
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0118SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
                 if (!mode) return false;
                 var modeLower = mode.toLowerCase().trim();
                 // Advanced Game doit contenir "game" ou "advanced game"
@@ -1036,21 +1036,21 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Extended Stereo
         icon: mdi:speaker-wireless
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0112SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var nameMatch = modeLower.includes('extended') && modeLower.includes('stereo');
@@ -1074,7 +1074,6 @@ cards:
           icon:
             - color: white
             - width: 32px
-
   - type: custom:mushroom-title-card
     title: Modes Dolby Pro Logic
     subtitle: Modes Dolby et DTS
@@ -1083,14 +1082,14 @@ cards:
     square: false
     cards:
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Cycle Dolby/DTS
         icon: mdi:sync
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0010SR
         subtitle: |
           Appuyer plusieurs fois pour changer
@@ -1098,7 +1097,7 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
                 if (!mode) return false;
                 var modeLower = mode.toLowerCase().trim();
                 return modeLower.includes('pro logic') || modeLower.includes('neo:6') || modeLower.includes('neural');
@@ -1121,21 +1120,21 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: PL II Movie
         icon: mdi:movie-open-outline
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0013SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var nameMatch = modeLower.includes('pro logic') && modeLower.includes('movie');
@@ -1160,21 +1159,21 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: PL II Music
         icon: mdi:music-note
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0014SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var nameMatch = modeLower.includes('pro logic') && modeLower.includes('music');
@@ -1199,21 +1198,21 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Dolby Surround
         icon: mdi:surround-sound-5-1
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0151SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var nameMatch = modeLower.includes('dolby surround') || (modeLower.includes('dolby') && modeLower.includes('surround'));
@@ -1238,14 +1237,14 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Cycle Dolby+THX
         icon: mdi:sync-circle
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0050SR
         subtitle: |
           Appuyer plusieurs fois pour changer
@@ -1253,8 +1252,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var codeStr = modeCode ? String(modeCode).trim() : '';
@@ -1278,14 +1277,14 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: Cycle DSP
         icon: mdi:equalizer
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0100SR
         subtitle: |
           Classical, Rock, Action, etc.
@@ -1293,8 +1292,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var codeStr = modeCode ? String(modeCode).trim() : '';
@@ -1319,7 +1318,8 @@ cards:
             - font-size: 12px
           icon:
             - color: white
-            - width: 32px  - type: custom:mushroom-title-card
+            - width: 32px
+  - type: custom:mushroom-title-card
     title: Modes THX
     subtitle: Modes cinéma, musique et jeux THX
   - type: grid
@@ -1327,21 +1327,21 @@ cards:
     square: false
     cards:
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: THX Cinema
         icon: mdi:movie-open
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0101SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 // Vérifier par le nom
@@ -1378,21 +1378,21 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: THX Music
         icon: mdi:music-circle
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0102SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var hasThx = modeLower.includes('thx');
@@ -1420,21 +1420,21 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: THX Games
         icon: mdi:gamepad
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0103SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var hasThx = modeLower.includes('thx');
@@ -1461,21 +1461,21 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: THX Select2 Cinema
         icon: mdi:movie-open-star
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0105SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var hasThx = modeLower.includes('thx');
@@ -1505,21 +1505,21 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: THX Select2 Music
         icon: mdi:music-note-eighth
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0106SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var hasThx = modeLower.includes('thx');
@@ -1549,21 +1549,21 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: THX Select2 Games
         icon: mdi:gamepad-circle
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0107SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var hasThx = modeLower.includes('thx');
@@ -1593,21 +1593,21 @@ cards:
             - color: white
             - width: 32px
       - type: custom:button-card
-        entity: media_player.pioneer_avr
+        entity: media_player.ampli
         name: THX Surround EX
         icon: mdi:surround-sound-7-1
         tap_action:
           action: call-service
           service: pioneer_avr_lx83.send_raw_command
           service_data:
-            entity_id: media_player.pioneer_avr
+            entity_id: media_player.ampli
             command: 0115SR
         state:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.pioneer_avr'].attributes.sound_mode;
-                var modeCode = states['media_player.pioneer_avr'].attributes.sound_mode_code;
+                var mode = states['media_player.ampli'].attributes.sound_mode;
+                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
                 if (!mode && !modeCode) return false;
                 var modeLower = mode ? mode.toLowerCase().trim() : '';
                 var hasThx = modeLower.includes('thx');
@@ -1642,14 +1642,14 @@ cards:
       - type: custom:mushroom-template-card
         primary: Alimentation
         secondary: |
-          {% if is_state('media_player.pioneer_avr', 'on') %}
+          {% if is_state('media_player.ampli', 'on') %}
             ● Allumé
           {% else %}
             ○ Éteint
           {% endif %}
         icon: mdi:power
         icon_color: |
-          {% if is_state('media_player.pioneer_avr', 'on') %}
+          {% if is_state('media_player.ampli', 'on') %}
             green
           {% else %}
             red
@@ -1662,8 +1662,7 @@ cards:
             }
       - type: custom:mushroom-template-card
         primary: Source active
-        secondary: >-
-          {{ state_attr('media_player.pioneer_avr', 'source') | default('Aucune') }}
+        secondary: "{{ state_attr('media_player.ampli', 'source') | default('Aucune') }}"
         icon: mdi:import
         icon_color: purple
         card_mod:
@@ -1674,11 +1673,11 @@ cards:
             }
       - type: custom:mushroom-template-card
         primary: Volume
-        secondary: >
-          {% if state_attr('media_player.pioneer_avr', 'is_volume_muted') %}
+        secondary: |
+          {% if state_attr('media_player.ampli', 'is_volume_muted') %}
             🔇 Muet
-          {% elif state_attr('media_player.pioneer_avr', 'volume_level') != None %}
-            {{ (state_attr('media_player.pioneer_avr', 'volume_level') * 100) | round }}%
+          {% elif state_attr('media_player.ampli', 'volume_level') != None %}
+            {{ (state_attr('media_player.ampli', 'volume_level') * 100) | round }}%
           {% else %}
             N/A
           {% endif %}
@@ -1692,8 +1691,7 @@ cards:
             }
       - type: custom:mushroom-template-card
         primary: Mode audio
-        secondary: >-
-          {{ state_attr('media_player.pioneer_avr', 'sound_mode') | default('N/A') }}
+        secondary: "{{ state_attr('media_player.ampli', 'sound_mode') | default('N/A') }}"
         icon: mdi:surround-sound
         icon_color: cyan
         card_mod:
@@ -1705,7 +1703,8 @@ cards:
       - type: custom:mushroom-template-card
         primary: Code du mode
         secondary: >-
-          {{ state_attr('media_player.pioneer_avr', 'sound_mode_code') | default('N/A') }}
+          {{ state_attr('media_player.ampli', 'sound_mode_code') |
+          default('N/A') }}
         icon: mdi:code-json
         icon_color: amber
         card_mod:
@@ -1717,7 +1716,8 @@ cards:
       - type: custom:mushroom-template-card
         primary: Dernière réponse
         secondary: >-
-          {{ state_attr('media_player.pioneer_avr', 'last_response') | default('Aucune') }}
+          {{ state_attr('media_player.ampli', 'last_response') |
+          default('Aucune') }}
         icon: mdi:reply
         icon_color: green
         card_mod:
