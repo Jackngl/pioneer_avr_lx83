@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.9] - 2026-02-13
+
+- Correction du mapping des modes audio (ajout du mode 'Multi Ch In' code 0003)\n- Ajout de nombreux modes d'écoute Pioneer manquants pour éviter l'affichage 'Mode XXXX'\n- Amélioration de la détection des modes audio dans le dashboard
+
 ## [1.2.8] - 2026-02-13
 
 - Amélioration de la robustesse du mapping des sources (insensible à la casse)\n- Correction de la détection de l'état des boutons sur le dashboard\n- Priorité aux noms définis dans 'DEFAULT_SOURCES'

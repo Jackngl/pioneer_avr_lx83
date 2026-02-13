@@ -1,4 +1,4 @@
-ttype: vertical-stack
+type: vertical-stack
 cards:
   - type: custom:mushroom-title-card
     title: Pioneer AVR
@@ -76,7 +76,9 @@ cards:
           - operator: template
             value: |
               [[[
-                return states['media_player.ampli'].attributes.source === 'CD';
+                var source = states['media_player.ampli'].attributes.source;
+                var resp = states['media_player.ampli'].attributes.last_response;
+                return source === 'CD' || (resp && resp.includes('FN01'));
               ]]]
             styles:
               card:
@@ -109,7 +111,9 @@ cards:
           - operator: template
             value: |
               [[[
-                return states['media_player.ampli'].attributes.source === 'Tuner';
+                var source = states['media_player.ampli'].attributes.source;
+                var resp = states['media_player.ampli'].attributes.last_response;
+                return source === 'Tuner' || (resp && resp.includes('FN02'));
               ]]]
             styles:
               card:
@@ -142,7 +146,9 @@ cards:
           - operator: template
             value: |
               [[[
-                return states['media_player.ampli'].attributes.source === 'Phono';
+                var source = states['media_player.ampli'].attributes.source;
+                var resp = states['media_player.ampli'].attributes.last_response;
+                return source === 'Phono' || (resp && resp.includes('FN00'));
               ]]]
             styles:
               card:
@@ -175,7 +181,9 @@ cards:
           - operator: template
             value: |
               [[[
-                return states['media_player.ampli'].attributes.source === 'iPod/USB';
+                var source = states['media_player.ampli'].attributes.source;
+                var resp = states['media_player.ampli'].attributes.last_response;
+                return source === 'iPod/USB' || (resp && resp.includes('FN17'));
               ]]]
             styles:
               card:
@@ -208,7 +216,9 @@ cards:
           - operator: template
             value: |
               [[[
-                return states['media_player.ampli'].attributes.source === 'Bluetooth';
+                var source = states['media_player.ampli'].attributes.source;
+                var resp = states['media_player.ampli'].attributes.last_response;
+                return source === 'Bluetooth' || (resp && resp.includes('FN33'));
               ]]]
             styles:
               card:
@@ -756,7 +766,9 @@ cards:
           - operator: template
             value: |
               [[[
-                return states['media_player.ampli'].attributes.source === 'DVD';
+                var source = states['media_player.ampli'].attributes.source;
+                var resp = states['media_player.ampli'].attributes.last_response;
+                return source === 'DVD' || (resp && resp.includes('FN04'));
               ]]]
             styles:
               card:
@@ -790,8 +802,8 @@ cards:
             value: |
               [[[
                 var source = states['media_player.ampli'].attributes.source;
-                console.log('Current source:', source);
-                return source === 'BD' || source === 'Blu-ray' || source === 'BluRay';
+                var resp = states['media_player.ampli'].attributes.last_response;
+                return source === 'BD' || (resp && resp.includes('FN25'));
               ]]]
             styles:
               card:
@@ -824,7 +836,9 @@ cards:
           - operator: template
             value: |
               [[[
-                return states['media_player.ampli'].attributes.source === 'TV/Sat';
+                var source = states['media_player.ampli'].attributes.source;
+                var resp = states['media_player.ampli'].attributes.last_response;
+                return source === 'TV/Sat' || (resp && resp.includes('FN05'));
               ]]]
             styles:
               card:
@@ -866,10 +880,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                if (!mode) return false;
-                var modeLower = mode.toLowerCase();
-                return modeLower === 'stereo' || modeLower.includes('stereo');
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0001';
               ]]]
             styles:
               card:
@@ -902,10 +914,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                if (!mode) return false;
-                var modeLower = mode.toLowerCase();
-                return modeLower === 'auto surround' || modeLower.includes('auto surround') || modeLower.includes('auto');
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0006';
               ]]]
             styles:
               card:
@@ -938,11 +948,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                if (!mode) return false;
-                var modeLower = mode.toLowerCase().trim();
-                // Direct doit être exactement "direct" et ne pas contenir "pure"
-                return modeLower === 'direct' && !modeLower.includes('pure');
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0007';
               ]]]
             styles:
               card:
@@ -975,11 +982,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                if (!mode) return false;
-                var modeLower = mode.toLowerCase().trim();
-                // Pure Direct doit contenir "pure" ET "direct"
-                return modeLower.includes('pure') && modeLower.includes('direct');
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0008';
               ]]]
             styles:
               card:
@@ -1012,11 +1016,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                if (!mode) return false;
-                var modeLower = mode.toLowerCase().trim();
-                // Advanced Game doit contenir "game" ou "advanced game"
-                return modeLower === 'advanced game' || (modeLower.includes('game') && modeLower.includes('advanced'));
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0118';
               ]]]
             styles:
               card:
@@ -1049,13 +1050,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                var nameMatch = modeLower.includes('extended') && modeLower.includes('stereo');
-                var codeMatch = modeCode && String(modeCode).trim() === '0112';
-                return nameMatch || codeMatch;
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0112';
               ]]]
             styles:
               card:
@@ -1133,13 +1129,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                var nameMatch = modeLower.includes('pro logic') && modeLower.includes('movie');
-                var codeMatch = modeCode && String(modeCode).trim() === '0102';
-                return nameMatch || codeMatch;
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0013';
               ]]]
             styles:
               card:
@@ -1172,13 +1163,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                var nameMatch = modeLower.includes('pro logic') && modeLower.includes('music');
-                var codeMatch = modeCode && String(modeCode).trim() === '0104';
-                return nameMatch || codeMatch;
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0014';
               ]]]
             styles:
               card:
@@ -1211,13 +1197,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                var nameMatch = modeLower.includes('dolby surround') || (modeLower.includes('dolby') && modeLower.includes('surround'));
-                var codeMatch = modeCode && String(modeCode).trim() === '0151';
-                return nameMatch || codeMatch;
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0151';
               ]]]
             styles:
               card:
@@ -1340,25 +1321,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                // Vérifier par le nom
-                var hasThx = modeLower.includes('thx');
-                var hasCinema = modeLower.includes('cinema');
-                var hasMusic = modeLower.includes('music');
-                var nameMatch = hasThx && hasCinema && !hasMusic;
-                // Vérifier aussi par le code (0101 = THX Cinema - code correct)
-                var codeMatch = false;
-                if (modeCode) {
-                  var codeStr = String(modeCode).trim();
-                  // Code correct pour THX Cinema: 0101
-                  // Accepter aussi les anciens codes pour compatibilité
-                  codeMatch = codeStr === '0101' ||  // Code correct
-                             codeStr === '0056';     // Ancien code (mappé vers 0101)
-                }
-                return nameMatch || codeMatch;
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0101';
               ]]]
             styles:
               card:
@@ -1391,16 +1355,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                var hasThx = modeLower.includes('thx');
-                var hasMusic = modeLower.includes('music');
-                var hasCinema = modeLower.includes('cinema');
-                var nameMatch = hasThx && hasMusic && !hasCinema;
-                var codeMatch = modeCode && String(modeCode).trim() === '0102';
-                return nameMatch || codeMatch;
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0102';
               ]]]
             styles:
               card:
@@ -1433,15 +1389,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                var hasThx = modeLower.includes('thx');
-                var hasGames = modeLower.includes('games');
-                var nameMatch = hasThx && hasGames;
-                var codeMatch = modeCode && String(modeCode).trim() === '0103';
-                return nameMatch || codeMatch;
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0103';
               ]]]
             styles:
               card:
@@ -1474,18 +1423,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                var hasThx = modeLower.includes('thx');
-                var hasSelect2 = modeLower.includes('select2') || modeLower.includes('ultra2');
-                var hasCinema = modeLower.includes('cinema');
-                var hasMusic = modeLower.includes('music');
-                var hasGames = modeLower.includes('games');
-                var nameMatch = hasThx && hasSelect2 && hasCinema && !hasMusic && !hasGames;
-                var codeMatch = modeCode && (String(modeCode).trim() === '0105');
-                return nameMatch || codeMatch;
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0105';
               ]]]
             styles:
               card:
@@ -1518,18 +1457,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                var hasThx = modeLower.includes('thx');
-                var hasSelect2 = modeLower.includes('select2') || modeLower.includes('ultra2');
-                var hasMusic = modeLower.includes('music');
-                var hasCinema = modeLower.includes('cinema');
-                var hasGames = modeLower.includes('games');
-                var nameMatch = hasThx && hasSelect2 && hasMusic && !hasCinema && !hasGames;
-                var codeMatch = modeCode && (String(modeCode).trim() === '0106');
-                return nameMatch || codeMatch;
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0106';
               ]]]
             styles:
               card:
@@ -1562,18 +1491,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                var hasThx = modeLower.includes('thx');
-                var hasSelect2 = modeLower.includes('select2') || modeLower.includes('ultra2');
-                var hasGames = modeLower.includes('games');
-                var hasCinema = modeLower.includes('cinema');
-                var hasMusic = modeLower.includes('music');
-                var nameMatch = hasThx && hasSelect2 && hasGames && !hasCinema && !hasMusic;
-                var codeMatch = modeCode && (String(modeCode).trim() === '0107');
-                return nameMatch || codeMatch;
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0107';
               ]]]
             styles:
               card:
@@ -1606,15 +1525,8 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                var hasThx = modeLower.includes('thx');
-                var hasSurroundEx = modeLower.includes('surround ex') || modeLower.includes('surroundex') || modeLower.includes('surround ex');
-                var nameMatch = hasThx && hasSurroundEx;
-                var codeMatch = modeCode && (String(modeCode).trim() === '0115');
-                return nameMatch || codeMatch;
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                return code === '0115';
               ]]]
             styles:
               card:

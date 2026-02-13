@@ -150,8 +150,26 @@ DEFAULT_LISTENING_MODES = {
     "Pure Direct": "0008",
     "Stereo": "0001",
     "Standard": "0010",  # Standard (Dolby/DTS)
+    "Multi Ch In": "0003",
+    "Auto Surround": "0006",
+    "Direct": "0007",
     "Extended Stereo": "0112",
     "Advanced Game": "0118",
+    "Action": "0201",
+    "Rock/Pop": "0202",
+    "Sports": "0203",
+    "Classical": "0204",
+    "Sci-Fi": "0205",
+    "Drama": "0206",
+    "Entertainment Show": "0207",
+    "Expanded Theater": "0209",
+    "TV Surround": "0210",
+    "Advanced Game": "0211",
+    "Sports": "0212",
+    "Classical": "0213",
+    "Rock/Pop": "0214",
+    "Drama": "0215",
+    "Phones Surround": "0216",
     # THX modes
     "THX Cinema": "0101",
     "THX Games": "0103",
@@ -167,7 +185,6 @@ DEFAULT_LISTENING_MODES = {
     # Autres modes
     "Optimum Surround": "0152",
     "Eco Mode": "0200",
-    "Action": "0201",
 }
 
 # Mapping des codes étendus retournés par certains modèles Pioneer
