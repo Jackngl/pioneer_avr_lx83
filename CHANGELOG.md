@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-02-13
+
+- Suppression du nom redondant 'Pioneer AVR Pioneer AVR' sur Alexa\n- Optimisation de la gestion du nom de l'entité via has_entity_name
+
 ## [1.2.1] - 2026-02-13
 
 - Correction du conflit de nom avec la TV physique\n- Passage de la device_class en 'speaker' pour éviter la confusion d'Alexa\n- Renommage de l'entrée 'TV' en 'Télévision' dans la liste principale

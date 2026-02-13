@@ -119,7 +119,6 @@ class PioneerAVR(MediaPlayerEntity):
         }
         self._host = host
         self._port = port
-        self._name = name
         self._power_state = STATE_OFF
         self._playback_state: str | None = None
         self._volume = 0.0
@@ -148,11 +147,6 @@ class PioneerAVR(MediaPlayerEntity):
         self._command_lock = asyncio.Lock()
         self._socket: socket.socket | None = None
         self._dynamic_sources_loaded = False
-
-    @property
-    def name(self) -> str:
-        """Return the name of the device."""
-        return self._name
 
     @property
     def state(self) -> str:
