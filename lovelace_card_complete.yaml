@@ -1233,12 +1233,10 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                var codeStr = modeCode ? String(modeCode).trim() : '';
-                return codeStr.startsWith('03') && modeLower.includes('thx');
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                if (!code) return false;
+                var codeStr = String(code).trim();
+                return codeStr.startsWith('005'); // THX range 0051-0057
               ]]]
             styles:
               card:
@@ -1273,15 +1271,10 @@ cards:
           - operator: template
             value: |
               [[[
-                var mode = states['media_player.ampli'].attributes.sound_mode;
-                var modeCode = states['media_player.ampli'].attributes.sound_mode_code;
-                if (!mode && !modeCode) return false;
-                var modeLower = mode ? mode.toLowerCase().trim() : '';
-                var codeStr = modeCode ? String(modeCode).trim() : '';
-                return codeStr.startsWith('02') && 
-                      (modeLower.includes('classical') || modeLower.includes('rock') || 
-                       modeLower.includes('action') || modeLower.includes('drama') ||
-                       modeLower.includes('sci-fi') || modeLower.includes('sports'));
+                var code = states['media_player.ampli'].attributes.sound_mode_code;
+                if (!code) return false;
+                var codeStr = String(code).trim();
+                return codeStr.startsWith('010') || codeStr === '0112' || codeStr === '0118';
               ]]]
             styles:
               card:
@@ -1316,13 +1309,13 @@ cards:
           service: pioneer_avr_lx83.send_raw_command
           service_data:
             entity_id: media_player.ampli
-            command: 0101SR
+            command: 0051SR
         state:
           - operator: template
             value: |
               [[[
                 var code = states['media_player.ampli'].attributes.sound_mode_code;
-                return code === '0101';
+                return code === '0051';
               ]]]
             styles:
               card:
@@ -1350,13 +1343,13 @@ cards:
           service: pioneer_avr_lx83.send_raw_command
           service_data:
             entity_id: media_player.ampli
-            command: 0102SR
+            command: 0052SR
         state:
           - operator: template
             value: |
               [[[
                 var code = states['media_player.ampli'].attributes.sound_mode_code;
-                return code === '0102';
+                return code === '0052';
               ]]]
             styles:
               card:
@@ -1384,13 +1377,13 @@ cards:
           service: pioneer_avr_lx83.send_raw_command
           service_data:
             entity_id: media_player.ampli
-            command: 0103SR
+            command: 0053SR
         state:
           - operator: template
             value: |
               [[[
                 var code = states['media_player.ampli'].attributes.sound_mode_code;
-                return code === '0103';
+                return code === '0053';
               ]]]
             styles:
               card:
@@ -1418,13 +1411,13 @@ cards:
           service: pioneer_avr_lx83.send_raw_command
           service_data:
             entity_id: media_player.ampli
-            command: 0105SR
+            command: 0054SR
         state:
           - operator: template
             value: |
               [[[
                 var code = states['media_player.ampli'].attributes.sound_mode_code;
-                return code === '0105';
+                return code === '0054';
               ]]]
             styles:
               card:
@@ -1452,13 +1445,13 @@ cards:
           service: pioneer_avr_lx83.send_raw_command
           service_data:
             entity_id: media_player.ampli
-            command: 0106SR
+            command: 0055SR
         state:
           - operator: template
             value: |
               [[[
                 var code = states['media_player.ampli'].attributes.sound_mode_code;
-                return code === '0106';
+                return code === '0055';
               ]]]
             styles:
               card:
@@ -1486,13 +1479,13 @@ cards:
           service: pioneer_avr_lx83.send_raw_command
           service_data:
             entity_id: media_player.ampli
-            command: 0107SR
+            command: 0056SR
         state:
           - operator: template
             value: |
               [[[
                 var code = states['media_player.ampli'].attributes.sound_mode_code;
-                return code === '0107';
+                return code === '0056';
               ]]]
             styles:
               card:

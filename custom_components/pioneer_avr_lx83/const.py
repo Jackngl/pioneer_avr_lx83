@@ -145,44 +145,36 @@ SOURCE_ALIASES = {
 # We map both the standard codes and extended codes to the same mode names
 # IMPORTANT: THX modes use codes starting with 01xx, not 00xx
 DEFAULT_LISTENING_MODES = {
-    "Auto Surround": "0006",  # Auto Surround / Stream Direct
-    "Direct": "0007",
-    "Pure Direct": "0008",
     "Stereo": "0001",
-    "Standard": "0010",  # Standard (Dolby/DTS)
-    "Multi Ch In": "0003",
+    "ALC": "0153",  # Auto Level Control
+    "F.S.S.A. Advance": "0154",  # Front Stage Surround Advance
     "Auto Surround": "0006",
     "Direct": "0007",
+    "Pure Direct": "0008",
+    "Standard": "0010",
+    "Multi Ch In": "0003",
     "Extended Stereo": "0112",
     "Advanced Game": "0118",
-    "Action": "0201",
-    "Rock/Pop": "0202",
-    "Sports": "0203",
-    "Classical": "0204",
-    "Sci-Fi": "0205",
-    "Drama": "0206",
-    "Entertainment Show": "0207",
-    "Expanded Theater": "0209",
-    "TV Surround": "0210",
-    "Advanced Game": "0211",
-    "Sports": "0212",
-    "Classical": "0213",
-    "Rock/Pop": "0214",
-    "Drama": "0215",
-    "Phones Surround": "0216",
-    # THX modes
-    "THX Cinema": "0101",
-    "THX Games": "0103",
-    "THX Music": "0102",
-    "THX Select2 Cinema": "0105",  # THX Select2 Cinema / Ultra2 Cinema
-    "THX Select2 Music": "0106",   # THX Select2 Music / Ultra2 Music
-    "THX Select2 Games": "0107",   # THX Select2 Games / Ultra2 Games
-    "THX Surround EX": "0115",
-    # Dolby modes
+    "Action": "0101",
+    "Sci-Fi": "0102",
+    "Drama": "0103",
+    "Entertainment Show": "0104",
+    "Mono Film": "0105",
+    "Expanded Theater": "0106",
+    "Classical": "0107",
+    "Rock/Pop": "0108",
+    "Unplugged": "0109",
+    "Phones Surround": "0111",
+    "THX Cinema": "0051",
+    "THX Music": "0052",
+    "THX Games": "0053",
+    "THX Select2 Cinema": "0054",
+    "THX Select2 Music": "0055",
+    "THX Select2 Games": "0056",
+    "THX Surround EX": "0057",
     "PRO LOGIC II Movie": "0013",
     "PRO LOGIC II Music": "0014",
-    "Dolby Surround": "0151",  # Pour les modèles récents Atmos/LX
-    # Autres modes
+    "Dolby Surround": "0151",
     "Optimum Surround": "0152",
     "Eco Mode": "0200",
 }
@@ -192,27 +184,43 @@ DEFAULT_LISTENING_MODES = {
 # Certains modèles retournent des codes avec format différent (ex: "0208" pour Advanced Game)
 # IMPORTANT: THX modes retournent "LM0101", "LM0102", etc. (pas "LM0056")
 LISTENING_MODE_CODE_MAPPING = {
-    "0401": "0006",  # Auto Surround (code étendu)
-    "040d": "0006",  # Auto Surround (variante)
-    "0501": "0001",  # Stereo (code étendu)
-    "0601": "0007",  # Direct (code étendu)
-    "0701": "0008",  # Pure Direct (code étendu)
-    "0208": "0118",  # Advanced Game (code étendu)
-    "0201": "0201",  # Action (mapping direct pour éviter "Mode 0201")
-    "0801": "0118",  # Advanced Game (autre variante)
-    # THX modes - codes corrects
-    "0101": "0101",  # THX Cinema (code standard)
-    "0102": "0102",  # THX Music (code standard)
-    "0103": "0103",  # THX Games (code standard)
-    "0105": "0105",  # THX Select2 Cinema
-    "0106": "0106",  # THX Select2 Music
-    "0107": "0107",  # THX Select2 Games
-    "0115": "0115",  # THX Surround EX
-    # Anciens codes (pour compatibilité si certains modèles les retournent encore)
-    "0056": "0101",  # Ancien code THX Cinema -> nouveau code
-    "0069": "0102",  # Ancien code THX Music -> nouveau code
-    "0608": "0008",  # Pure Direct (autre variante)
-    "0708": "0008",  # Pure Direct (autre variante)
+    # Stereo & Variants (SR0001)
+    "0001": "0001",  # Stereo
+    "0002": "0153",  # ALC (Auto Level Control)
+    "0003": "0154",  # F.S.S.A Advance
+    
+    # Direct & Stream (SR0005)
+    "0401": "0006",  # Auto Surround
+    "040e": "0006",  # Auto Surround (Variant)
+    "0501": "0001",  # Stereo (Variant)
+    "0601": "0007",  # Direct
+    "0701": "0008",  # Pure Direct
+    "0881": "0152",  # Optimum Surround
+    
+    # THX (SR0050)
+    "0303": "0051",  # THX Cinema
+    "0302": "0052",  # THX Music
+    "0304": "0053",  # THX Games
+    "0309": "0054",  # THX Select2 Cinema
+    "030c": "0055",  # THX Select2 Music
+    "0307": "0056",  # THX Select2 Games
+    "030a": "0057",  # THX Surround EX
+    
+    # Standard & DSP (SR0010)
+    "0104": "0010",  # Standard
+    "0102": "0013",  # PRO LOGIC II Movie
+    "0106": "0106",  # Expanded Theater
+    "0107": "0107",  # Classical
+    "0108": "0108",  # Rock/Pop
+    "0109": "0109",  # Unplugged
+    
+    # Advanced Surround (SR0100)
+    "0201": "0101",  # Action
+    "0202": "0103",  # Drama
+    "0203": "0102",  # Sci-Fi
+    "020d": "0112",  # Extended Stereo
+    "0208": "0118",  # Advanced Game
+    "020a": "0101",  # Action (variant)
 }
 
 LISTENING_MODE_ALIASES = {
