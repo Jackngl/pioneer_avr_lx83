@@ -147,6 +147,7 @@ class PioneerAVR(MediaPlayerEntity):
         self._command_lock = asyncio.Lock()
         self._socket: socket.socket | None = None
         self._dynamic_sources_loaded = False
+        self._last_response: str = ""
 
     @property
     def state(self) -> str:
@@ -205,6 +206,7 @@ class PioneerAVR(MediaPlayerEntity):
             "volume_db": self._step_to_db(self._volume_step),
             "sound_mode_code": self._sound_mode_code,
             "available_sound_modes": self.sound_mode_list,
+            "last_response": self._last_response,
         }
         if self._tuner_frequency is not None:
             attrs["tuner_frequency_mhz"] = self._tuner_frequency
@@ -335,6 +337,7 @@ class PioneerAVR(MediaPlayerEntity):
             CMD_POWER_QUERY, UPDATE_TIMEOUT
         )
         if power_response:
+            self._last_response = power_response.decode().strip()
             # Vérifier les deux formats possibles de réponse
             self._power_state = (
                 STATE_ON
@@ -651,9 +654,15 @@ class PioneerAVR(MediaPlayerEntity):
         """Send a command and get response."""
         async with self._command_lock:
             try:
-                return await self.hass.async_add_executor_job(
+                resp = await self.hass.async_add_executor_job(
                     self._send_command_sync_with_response, command, timeout
                 )
+                if resp:
+                    try:
+                        self._last_response = resp.decode().strip()
+                    except Exception:
+                        pass
+                return resp
             except (
                 socket.timeout,
                 socket.error,

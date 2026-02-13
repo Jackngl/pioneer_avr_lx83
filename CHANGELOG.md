@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.7] - 2026-02-13
+
+- Optimisation pour le dashboard Mushroom du projet\n- Ajout de l'attribut 'last_response' pour le débug en direct\n- Alignement des noms de sources sur le dashboard: 'TV' -> 'TV/Sat', 'iPod' -> 'iPod/USB', 'Blu-ray' -> 'BD'\n- Correction du domaine pour les appels de service: utiliser 'pioneer_avr_lx83.send_raw_command'
+
 ## [1.2.6] - 2026-02-13
 
 - Rétablissement de la gestion dynamique des noms (has_entity_name)\n- Maintien du mode 'receiver' pour le contrôle complet des entrées\n- Nom par défaut 'Pioneer'
