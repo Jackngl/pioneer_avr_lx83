@@ -6,7 +6,7 @@ from homeassistant.components.media_player import MediaPlayerEntityFeature
 from homeassistant.const import STATE_OFF, STATE_ON
 
 DOMAIN = "pioneer_avr_lx83"
-DEFAULT_NAME = "Pioneer AVR"
+DEFAULT_NAME = "Pioneer"
 DEFAULT_PORT = 23
 DEFAULT_TIMEOUT = 10  # seconds instead of 5
 UPDATE_TIMEOUT = 2  # seconds - shorter timeout for update queries to avoid exceeding scan interval

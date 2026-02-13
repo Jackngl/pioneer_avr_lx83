@@ -149,11 +149,6 @@ class PioneerAVR(MediaPlayerEntity):
         self._dynamic_sources_loaded = False
 
     @property
-    def name(self) -> str:
-        """Return the name of the device."""
-        return self._attr_device_info["name"]
-
-    @property
     def state(self) -> str:
         """Return the state of the device."""
         if self._power_state == STATE_OFF:
