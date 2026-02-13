@@ -63,7 +63,7 @@ DEFAULT_SOURCES = {
     "Tuner": "02",
     "CDR/Tape": "03",
     "DVD": "04",
-    "TV": "05",
+    "Télévision": "05",
     "Video 1": "10",
     "Multi Ch": "12",
     "Video 2": "14",

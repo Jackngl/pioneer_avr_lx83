@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-02-13
+
+- Correction du conflit de nom avec la TV physique\n- Passage de la device_class en 'speaker' pour éviter la confusion d'Alexa\n- Renommage de l'entrée 'TV' en 'Télévision' dans la liste principale
+
 ## [1.2.0] - 2026-02-12
 
 - Amélioration de la compatibilité Alexa (InputController)\n- Support natif des sources reconnues par Alexa (TV, HDMI 1, etc.)\n- Ajout de la classe d'appareil 'receiver' pour une meilleure identification\n- Enrichissement des alias de sources en français\n- Amélioration du mapping des modes d'écoute (Mode 0201 -> Action)\n- Suppression du code personnalisé redondant au profit des standards Home Assistant

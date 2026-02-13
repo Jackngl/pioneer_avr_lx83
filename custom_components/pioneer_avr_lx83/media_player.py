@@ -96,7 +96,7 @@ class PioneerAVR(MediaPlayerEntity):
 
     _attr_has_entity_name = True
     _attr_name = None
-    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
+    _attr_device_class = MediaPlayerDeviceClass.SPEAKER
     _attr_icon = "mdi:amplifier"
     _attr_should_poll = True
     _attr_scan_interval = SCAN_INTERVAL
