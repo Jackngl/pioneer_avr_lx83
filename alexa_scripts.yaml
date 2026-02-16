@@ -1,0 +1,160 @@
+# Scripts Home Assistant pour Alexa (Pioneer LX83)
+# Ces scripts apparaîtront comme des "Scènes" dans Alexa.
+# Une fois ajoutés à votre fichier scripts.yaml, dites : "Alexa, active [Nom du script]"
+
+# --- MODES AUDIO ---
+
+ampli_mode_thx_cinema:
+  alias: "Mode Cinéma THX"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "0051SR"
+
+ampli_mode_thx_musique:
+  alias: "Mode Musique THX"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "0052SR"
+
+ampli_mode_stereo:
+  alias: "Mode Stéréo"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "0001SR"
+
+ampli_mode_auto:
+  alias: "Mode Auto Surround"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "0006SR"
+
+ampli_mode_direct:
+  alias: "Mode Direct"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "0007SR"
+
+ampli_mode_pure_direct:
+  alias: "Mode Pure Direct"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "0008SR"
+
+ampli_mode_jeu:
+  alias: "Mode Jeu"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "0118SR"
+
+ampli_mode_dolby_cinema:
+  alias: "Mode Dolby Cinéma"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "0013SR"
+
+ampli_mode_dolby_musique:
+  alias: "Mode Dolby Musique"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "0014SR"
+
+ampli_mode_neo6_cinema:
+  alias: "Mode Neo Six Cinéma"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "0011SR"
+
+ampli_mode_neo6_musique:
+  alias: "Mode Neo Six Musique"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "0012SR"
+
+
+# --- ENTRÉES (SOURCES) ---
+
+ampli_entree_tv:
+  alias: "Entrée Télévision"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "05FN"
+
+ampli_entree_hdmi1:
+  alias: "Entrée HDMI 1"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "19FN"
+
+ampli_entree_hdmi2:
+  alias: "Entrée HDMI 2"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "20FN"
+
+ampli_entree_hdmi3:
+  alias: "Entrée HDMI 3"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "21FN"
+
+ampli_entree_bluray:
+  alias: "Entrée Blu-ray"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "25FN"
+
+ampli_entree_bluetooth:
+  alias: "Entrée Bluetooth"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "33FN"
+
+ampli_entree_phono:
+  alias: "Entrée Phono"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "00FN"
+
+ampli_entree_cd:
+  alias: "Entrée CD"
+  sequence:
+    - action: pioneer_avr_lx83.send_raw_command
+      data:
+        entity_id: media_player.ampli
+        command: "01FN"
