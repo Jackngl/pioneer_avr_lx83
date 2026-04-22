@@ -10,7 +10,7 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 
@@ -36,17 +36,22 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user input allows us to connect."""
-    host = data[CONF_HOST]
-    port = data[CONF_PORT]
+    host = (data.get(CONF_HOST) or "").strip()
+    if not host:
+        raise CannotConnect("L'adresse IP ou le nom d'hôte est vide")
 
     try:
-        # Test connection
+        port = int(data.get(CONF_PORT, DEFAULT_PORT))
+    except (TypeError, ValueError):
+        port = DEFAULT_PORT
+
+    try:
         await hass.async_add_executor_job(_test_connection, host, port)
     except Exception as err:
         _LOGGER.error("Cannot connect to Pioneer AVR: %s", err)
-        raise CannotConnect from err
+        raise CannotConnect(str(err)) from err
 
-    return {"title": data[CONF_NAME]}
+    return {"title": data.get(CONF_NAME) or DEFAULT_NAME}
 
 
 def _test_connection(host: str, port: int) -> bool:
@@ -71,9 +76,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
-    @staticmethod
-    async def async_get_options_flow(
-        config_entry: config_entries.ConfigEntry,
+    @callback
+    def async_get_options_flow(
+        self, config_entry: config_entries.ConfigEntry
     ) -> OptionsFlowHandler:
         """Get the options flow for this handler."""
         return OptionsFlowHandler(config_entry)
@@ -93,13 +98,18 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 _LOGGER.exception("Unexpected exception during config flow")
                 errors["base"] = "unknown"
             else:
-                unique_id = (
-                    f"{user_input[CONF_HOST]}_{user_input.get(CONF_PORT, DEFAULT_PORT)}"
-                )
+                try:
+                    port = int(user_input.get(CONF_PORT, DEFAULT_PORT))
+                except (TypeError, ValueError):
+                    port = DEFAULT_PORT
+                host = (user_input.get(CONF_HOST) or "").strip()
+                unique_id = f"{host}_{port}"
                 await self.async_set_unique_id(unique_id)
                 self._abort_if_unique_id_configured()
-                # Add default sources to options
                 user_input.setdefault(CONF_SOURCES, DEFAULT_SOURCES)
+                user_input[CONF_HOST] = host
+                user_input[CONF_PORT] = port
+                user_input[CONF_NAME] = user_input.get(CONF_NAME) or DEFAULT_NAME
                 return self.async_create_entry(title=info["title"], data=user_input)
 
         return self.async_show_form(

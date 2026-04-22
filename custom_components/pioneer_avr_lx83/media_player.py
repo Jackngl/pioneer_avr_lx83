@@ -10,8 +10,8 @@ import time
 import voluptuous as vol
 
 from homeassistant.components.media_player import (
-    MediaPlayerDeviceClass,
     MediaPlayerEntity,
+    MediaPlayerEntityFeature,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -61,10 +61,22 @@ from .const import (
     RETRY_DELAY,
     SOURCE_ALIASES,
     SCAN_INTERVAL,
-    SUPPORT_PIONEER,
     UPDATE_TIMEOUT,
     VOLUME_DB_OFFSET,
     VOLUME_MAX,
+)
+
+# Features: defined here to avoid const.py importing media_player (config_flow loads const)
+SUPPORT_PIONEER = (
+    MediaPlayerEntityFeature.TURN_ON
+    | MediaPlayerEntityFeature.TURN_OFF
+    | MediaPlayerEntityFeature.VOLUME_SET
+    | MediaPlayerEntityFeature.VOLUME_STEP
+    | MediaPlayerEntityFeature.VOLUME_MUTE
+    | MediaPlayerEntityFeature.SELECT_SOURCE
+    | MediaPlayerEntityFeature.PLAY
+    | MediaPlayerEntityFeature.PAUSE
+    | MediaPlayerEntityFeature.SELECT_SOUND_MODE
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -81,6 +93,7 @@ async def async_setup_entry(
     name = config_entry.data.get(CONF_NAME, DEFAULT_NAME)
 
     entity = PioneerAVR(hass, name, host, port)
+    hass.data[DOMAIN][config_entry.entry_id] = entity
     async_add_entities([entity], True)
 
     platform = entity_platform.async_get_current_platform()
@@ -96,7 +109,6 @@ class PioneerAVR(MediaPlayerEntity):
 
     _attr_has_entity_name = True
     _attr_name = None
-    _attr_device_class = MediaPlayerDeviceClass.RECEIVER
     _attr_icon = "mdi:amplifier"
     _attr_should_poll = True
     _attr_scan_interval = SCAN_INTERVAL
@@ -119,6 +131,7 @@ class PioneerAVR(MediaPlayerEntity):
         }
         self._host = host
         self._port = port
+        self._name = name
         self._power_state = STATE_OFF
         self._playback_state: str | None = None
         self._volume = 0.0
@@ -147,7 +160,7 @@ class PioneerAVR(MediaPlayerEntity):
         self._command_lock = asyncio.Lock()
         self._socket: socket.socket | None = None
         self._dynamic_sources_loaded = False
-        self._last_response: str = ""
+
 
     @property
     def state(self) -> str:
@@ -206,7 +219,6 @@ class PioneerAVR(MediaPlayerEntity):
             "volume_db": self._step_to_db(self._volume_step),
             "sound_mode_code": self._sound_mode_code,
             "available_sound_modes": self.sound_mode_list,
-            "last_response": self._last_response,
         }
         if self._tuner_frequency is not None:
             attrs["tuner_frequency_mhz"] = self._tuner_frequency
@@ -275,14 +287,12 @@ class PioneerAVR(MediaPlayerEntity):
 
     async def async_select_source(self, source: str) -> None:
         """Select input source."""
-        _LOGGER.debug("Selecting source: %s", source)
         resolved = self._resolve_source_code(source)
         if not resolved:
-            _LOGGER.warning("Unknown source '%s' requested", source)
+            _LOGGER.debug("Unknown source '%s' requested", source)
             return
 
         source_code, canonical_name = resolved
-        _LOGGER.debug("Resolved source '%s' to code '%s' (%s)", source, source_code, canonical_name)
         await self._send_command(f"{source_code}{CMD_SOURCE}")
         self._source = canonical_name
         self.async_write_ha_state()
@@ -337,7 +347,6 @@ class PioneerAVR(MediaPlayerEntity):
             CMD_POWER_QUERY, UPDATE_TIMEOUT
         )
         if power_response:
-            self._last_response = power_response.decode().strip()
             # Vérifier les deux formats possibles de réponse
             self._power_state = (
                 STATE_ON
@@ -489,20 +498,10 @@ class PioneerAVR(MediaPlayerEntity):
         clean_code = code.strip()
         if not clean_name or not clean_code:
             return
-            
-        # Check if name already exists (case-insensitive)
-        name_exists = False
-        lowered_name = clean_name.lower()
-        for existing_name in self._sources:
-            if existing_name.lower() == lowered_name:
-                name_exists = True
-                break
-                
-        if not name_exists:
+        if clean_name not in self._sources:
             self._sources[clean_name] = clean_code
-            
         self._source_code_to_name.setdefault(clean_code, clean_name)
-        self._source_aliases[lowered_name] = clean_code
+        self._source_aliases[clean_name.lower()] = clean_code
 
     def _resolve_source_code(self, label: str) -> tuple[str, str] | None:
         """Return (code, canonical_name) for a source label, case-insensitively."""
@@ -664,15 +663,9 @@ class PioneerAVR(MediaPlayerEntity):
         """Send a command and get response."""
         async with self._command_lock:
             try:
-                resp = await self.hass.async_add_executor_job(
+                return await self.hass.async_add_executor_job(
                     self._send_command_sync_with_response, command, timeout
                 )
-                if resp:
-                    try:
-                        self._last_response = resp.decode().strip()
-                    except Exception:
-                        pass
-                return resp
             except (
                 socket.timeout,
                 socket.error,

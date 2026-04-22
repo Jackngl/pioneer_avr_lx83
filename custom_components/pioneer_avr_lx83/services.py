@@ -5,10 +5,12 @@ import voluptuous as vol
 
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.entity_component import EntityComponent
-from homeassistant.components.media_player import DOMAIN as MEDIA_PLAYER_DOMAIN
 
 from .const import DOMAIN
+
+# Use literal to avoid importing homeassistant.components.media_player at package load
+# (config flow would then load the whole package and trigger a 500)
+MEDIA_PLAYER_DOMAIN = "media_player"
 from .voice_commands import get_intent_from_command
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,15 +33,16 @@ async def async_setup_services(hass: HomeAssistant):
         entity_id = call.data[ATTR_ENTITY_ID]
         command = call.data[ATTR_COMMAND]
         
-        # Get the media player entity
-        component = hass.data.get(MEDIA_PLAYER_DOMAIN)
-        if not component:
-            _LOGGER.error("Media player component not found")
-            return
-            
-        entity = component.get_entity(entity_id)
+        # Get the media player entity from our domain data
+        entity = None
+        for item in hass.data.get(DOMAIN, {}).values():
+            # Check if the item is our PioneerAVR entity and matches the entity_id
+            if hasattr(item, "entity_id") and item.entity_id == entity_id:
+                entity = item
+                break
+                
         if not entity:
-            _LOGGER.error("Entity %s not found", entity_id)
+            _LOGGER.error("Entity %s not found in %s", entity_id, DOMAIN)
             return
             
         # Get the intent from the command
