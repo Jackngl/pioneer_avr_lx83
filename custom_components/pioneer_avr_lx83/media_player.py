@@ -364,20 +364,9 @@ class PioneerAVR(MediaPlayerEntity):
             return
 
         if self._power_state == STATE_ON:
-            # Load dynamic sources only once, and don't block updates if it fails
+            # Discover source labels in the background if not already loaded
             if not self._dynamic_sources_loaded:
-                try:
-                    await asyncio.wait_for(
-                        self._ensure_dynamic_sources(), timeout=UPDATE_TIMEOUT * 5
-                    )
-                except asyncio.TimeoutError:
-                    _LOGGER.warning(
-                        "Dynamic sources discovery timed out, continuing with default sources"
-                    )
-                    self._dynamic_sources_loaded = True  # Mark as loaded to avoid retrying
-                except Exception as err:
-                    _LOGGER.debug("Error loading dynamic sources: %s", err)
-                    self._dynamic_sources_loaded = True  # Mark as loaded to avoid retrying
+                self.hass.async_create_task(self._ensure_dynamic_sources())
 
             # Query volume with shorter timeout
             volume_response = await self._send_command_with_response(
@@ -463,15 +452,15 @@ class PioneerAVR(MediaPlayerEntity):
             return
 
         consecutive_misses = 0
-        for idx in range(MAX_SOURCE_SLOTS):
+        for idx in range(30):  # Reduced from 60 to 30 for speed
             code = f"{idx:02d}"
-            # Use shorter timeout for source discovery to avoid blocking
+            # Use very short timeout for discovery
             response = await self._send_command_with_response(
-                f"{CMD_SOURCE_NAME_QUERY}{code}", UPDATE_TIMEOUT
+                f"{CMD_SOURCE_NAME_QUERY}{code}", timeout=0.5
             )
             if not response:
                 consecutive_misses += 1
-                if consecutive_misses >= 10:
+                if consecutive_misses >= 5:  # Stop after 5 misses instead of 10
                     break
                 continue
 

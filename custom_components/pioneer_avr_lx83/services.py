@@ -19,8 +19,14 @@ ATTR_COMMAND = "command"
 ATTR_ENTITY_ID = "entity_id"
 
 SERVICE_PROCESS_VOICE_COMMAND = "process_voice_command"
+SERVICE_SEND_RAW_COMMAND = "send_raw_command"
 
 PROCESS_VOICE_COMMAND_SCHEMA = vol.Schema({
+    vol.Required(ATTR_ENTITY_ID): cv.entity_id,
+    vol.Required(ATTR_COMMAND): cv.string,
+})
+
+SEND_RAW_COMMAND_SCHEMA = vol.Schema({
     vol.Required(ATTR_ENTITY_ID): cv.entity_id,
     vol.Required(ATTR_COMMAND): cv.string,
 })
@@ -73,12 +79,35 @@ async def async_setup_services(hass: HomeAssistant):
         else:
             _LOGGER.warning("Unknown intent: %s", intent)
     
-    # Register the service
+    async def async_send_raw_command(call: ServiceCall):
+        """Send a raw command to the AVR."""
+        entity_id = call.data[ATTR_ENTITY_ID]
+        command = call.data[ATTR_COMMAND]
+        
+        entity = None
+        for item in hass.data.get(DOMAIN, {}).values():
+            if hasattr(item, "entity_id") and item.entity_id == entity_id:
+                entity = item
+                break
+                
+        if entity:
+            await entity.async_send_raw_command(command)
+        else:
+            _LOGGER.error("Entity %s not found for raw command", entity_id)
+
+    # Register the services
     hass.services.async_register(
         DOMAIN,
         SERVICE_PROCESS_VOICE_COMMAND,
         async_process_voice_command,
         schema=PROCESS_VOICE_COMMAND_SCHEMA,
+    )
+    
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_SEND_RAW_COMMAND,
+        async_send_raw_command,
+        schema=SEND_RAW_COMMAND_SCHEMA,
     )
     
     return True
