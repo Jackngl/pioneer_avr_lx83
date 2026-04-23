@@ -14,11 +14,8 @@ Custom Home Assistant integration for Pioneer AVR LX83 receivers using Telnet pr
 - ✅ Source selection
 - ✅ Real-time status updates
 - ✅ Basic transport control (play/pause)
-- ✅ Listening-mode selection + raw `send_raw_command` service
-- ✅ Config flow UI configuration
-- ✅ HACS compatible
-- ✅ Uses DataUpdateCoordinator (HA 2025.12+ compliant)
-- ✅ Automatic source discovery via Pioneer `?RGBxx` responses
+- ✅ Automatic background source discovery (no more timeouts at startup)
+- ⚠️ **Note on DLNA**: If Home Assistant discovers your AVR via DLNA, it's recommended to ignore the DLNA device to avoid conflicts and use this Telnet integration for full control.
 
 ### ⚠️ Important Technical Note
 
@@ -251,13 +248,8 @@ script:
 
 The entity created under the `media_player` domain exposes the following services:
 
-- `media_player.turn_on` : Turn on the amplifier
-- `media_player.turn_off` : Turn off the amplifier
-- `media_player.volume_up` : Increase volume
-- `media_player.volume_down` : Decrease volume
-- `media_player.set_volume_level` : Set volume level (0.0 to 1.0)
-- `media_player.volume_mute` : Enable/disable mute mode
-- `media_player.select_source` : Select input source
+- `pioneer_avr_lx83.send_raw_command` : Send raw Telnet commands (e.g., `01FN`, `0006SR`)
+- `pioneer_avr_lx83.process_voice_command` : Process natural language commands
 
 ### Available States
 
